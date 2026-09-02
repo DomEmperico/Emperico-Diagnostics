@@ -1,4 +1,4 @@
-/* Emperico Partner Diagnostics — shared engine
+/* Emperico Partner Diagnostics â€” shared engine
    Consumes a DATA object (defined per tool page) and drives the whole flow:
    intro -> capability areas -> working style -> reflections -> report. */
 
@@ -9,7 +9,9 @@ function initTool(DATA){
 
   let state = loadState() || {
     edition: DATA.defaultEdition || "A",
-    screen: "intro",
+    screen: "gate",
+    email: "",
+    resultsSent: false,
     areaIndex: 0,
     answers: {},
     disc: {},
@@ -26,7 +28,7 @@ function initTool(DATA){
     }catch(e){ return null; }
   }
   function resetState(){
-    state = { edition: DATA.defaultEdition || "A", screen:"intro", areaIndex:0, answers:{}, disc:{}, reflections:{} };
+    state = { edition: DATA.defaultEdition || "A", screen:"gate", email:"", resultsSent:false, areaIndex:0, answers:{}, disc:{}, reflections:{} };
     saveState();
     render();
   }
@@ -95,6 +97,37 @@ function initTool(DATA){
     render();
   }
 
+  // ---------- email gate ----------
+  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function renderGate(main){
+    const wrap = h("div", {class:"wrap"});
+    wrap.appendChild(h("h1", {}, [DATA.title]));
+    wrap.appendChild(h("p", {class:"lede"}, [DATA.subtitle]));
+    wrap.appendChild(h("hr", {class:"rule"}));
+    const panel = h("div", {class:"panel"});
+    panel.appendChild(h("h2", {}, ["Enter your email to begin"]));
+    panel.appendChild(h("p", {class:"area-desc"}, [
+      "We'll send your results here once you finish. Nothing else is sent, and your answers aren't shared beyond your own report."
+    ]));
+    const input = h("input", {type:"email", id:"gate-email", placeholder:"you@company.com",
+      style:"width:100%;font-size:16px;padding:12px 14px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--text);font-family:var(--sans);"});
+    const err = h("p", {class:"small", id:"gate-error", style:"color:#b3432b;min-height:18px;margin:10px 0 0;"}, [""]);
+    const submit = ()=>{
+      const val = input.value.trim();
+      if(!isValidEmail(val)){ err.textContent = "Enter a valid email address."; return; }
+      state.email = val;
+      state.screen = "intro";
+      saveState();
+      render();
+    };
+    input.addEventListener("keydown", (e)=>{ if(e.key === "Enter") submit(); });
+    panel.appendChild(input);
+    panel.appendChild(err);
+    panel.appendChild(h("button", {class:"btn", style:"margin-top:6px;", onclick:submit}, ["Continue"]));
+    wrap.appendChild(panel);
+    main.appendChild(wrap);
+  }
+
   // ---------- intro ----------
   function renderIntro(main){
     const wrap = h("div", {class:"wrap"});
@@ -110,7 +143,7 @@ function initTool(DATA){
       DATA.copy.introBody.forEach(p => wrap.appendChild(h("p", {class:"muted"}, [p])));
     }
     wrap.appendChild(h("p", {class:"small muted"}, [
-      DATA.areas.length + " capability areas · " + totalItemCount() + " statements · a working-style module · " + (DATA.copy.timeEstimate || "20–25 minutes")
+      DATA.areas.length + " capability areas Â· " + totalItemCount() + " statements Â· a working-style module Â· " + (DATA.copy.timeEstimate || "20â€“25 minutes")
     ]));
     const hasProgress = Object.keys(state.answers).length > 0;
     const row = h("div", {class:"btn-row"});
@@ -190,7 +223,7 @@ function initTool(DATA){
     const panel = h("div", {class:"panel"});
     panel.appendChild(h("h2", {}, ["Your Working Style"]));
     panel.appendChild(h("p", {class:"area-desc"}, [
-      DATA.copy.discIntro || "For each pair of situations below, mark the statement that's most like you and the one that's least like you. There are no right answers — this measures preference, not capability."
+      DATA.copy.discIntro || "For each pair of situations below, mark the statement that's most like you and the one that's least like you. There are no right answers â€” this measures preference, not capability."
     ]));
     DISC_BLOCKS.forEach(block => panel.appendChild(renderDiscBlock(block)));
     wrap.appendChild(panel);
@@ -303,18 +336,20 @@ function initTool(DATA){
       h("div", {class:"num"}, [overall.toFixed(1)]),
       h("div", {class:"band"}, [overallBand])
     ]));
-    hero.appendChild(h("p", {class:"muted small"}, ["Mean across all " + DATA.areas.length + " capability areas, each scored 1–5."]));
+    hero.appendChild(h("p", {class:"muted small"}, ["Mean across all " + DATA.areas.length + " capability areas, each scored 1â€“5."]));
     const bars = h("div", {class:"bars"});
     areaScores.slice().sort((a,b)=>b.score-a.score).forEach(a=>{
       const pct = clamp((a.score/5)*100, 0, 100);
       bars.appendChild(h("div", {class:"bar-row"}, [
         h("div", {class:"label"}, [a.name]),
         h("div", {class:"bar-track"}, [h("div", {class:"bar-fill", style:"width:"+pct+"%"})]),
-        h("div", {class:"score"}, [a.answered ? a.score.toFixed(1) : "–"])
+        h("div", {class:"score"}, [a.answered ? a.score.toFixed(1) : "â€“"])
       ]));
     });
     hero.appendChild(bars);
     wrap.appendChild(hero);
+    const note = h("p", {id:"resend-note", class:"small muted", style:"margin-top:14px;"}, ["Sending your results to " + state.email + "â€¦"]);
+    wrap.appendChild(note);
     wrap.appendChild(h("hr",{class:"rule"}));
 
     // priority areas (3 lowest)
@@ -327,7 +362,7 @@ function initTool(DATA){
         .sort((x,y)=>x.val-y.val).slice(0,2);
       const block = h("div", {class:"priority-area"});
       block.appendChild(h("h3", {}, [a.name]));
-      block.appendChild(h("div", {class:"band-note"}, [bandFor(a.score, DATA.areaBands) + " · " + a.score.toFixed(1) + " / 5"]));
+      block.appendChild(h("div", {class:"band-note"}, [bandFor(a.score, DATA.areaBands) + " Â· " + a.score.toFixed(1) + " / 5"]));
       const ul = h("ul", {class:"low-items"});
       itemScores.forEach(is => ul.appendChild(h("li", {}, [is.text])));
       block.appendChild(ul);
@@ -352,7 +387,7 @@ function initTool(DATA){
       ])));
       wrap.appendChild(grid);
     } else {
-      wrap.appendChild(h("p", {class:"muted"}, ["No area is yet at 3.4 or above — the priority areas above are where to start."]));
+      wrap.appendChild(h("p", {class:"muted"}, ["No area is yet at 3.4 or above â€” the priority areas above are where to start."]));
     }
     wrap.appendChild(h("hr",{class:"rule"}));
 
@@ -361,8 +396,8 @@ function initTool(DATA){
     const stylePanel = h("div", {class:"style-panel"});
     const primaryDef = DISC_STYLES[disc.primary];
     const label = disc.tiedPrimary.length > 1
-      ? disc.tiedPrimary.map(k=>DISC_STYLES[k].name).join("–") + " blend"
-      : primaryDef.name + (disc.secondary ? " – " + DISC_STYLES[disc.secondary].name + " blend" : "");
+      ? disc.tiedPrimary.map(k=>DISC_STYLES[k].name).join("â€“") + " blend"
+      : primaryDef.name + (disc.secondary ? " â€“ " + DISC_STYLES[disc.secondary].name + " blend" : "");
     stylePanel.appendChild(h("div", {class:"style-label"}, [label]));
     stylePanel.appendChild(h("p", {class:"style-blurb"}, [primaryDef.gives]));
     const discBars = h("div", {class:"disc-bars"});
@@ -383,10 +418,10 @@ function initTool(DATA){
     cols.appendChild(giveCol); cols.appendChild(watchCol);
     stylePanel.appendChild(cols);
     stylePanel.appendChild(h("p", {class:"coaching-note"}, [
-      "Style is a preference, not a capability — there's no right style for this role. For a " + primaryDef.name.toLowerCase() + " style, " + primaryDef.coach
+      "Style is a preference, not a capability â€” there's no right style for this role. For a " + primaryDef.name.toLowerCase() + " style, " + primaryDef.coach
     ]));
     stylePanel.appendChild(h("p", {class:"small muted", style:"margin-top:14px;"}, [
-      "Net scores (–20 to +20, around a neutral midline): D " + fmtNet(disc.net.D) + " · I " + fmtNet(disc.net.I) + " · S " + fmtNet(disc.net.S) + " · C " + fmtNet(disc.net.C)
+      "Net scores (â€“20 to +20, around a neutral midline): D " + fmtNet(disc.net.D) + " Â· I " + fmtNet(disc.net.I) + " Â· S " + fmtNet(disc.net.S) + " Â· C " + fmtNet(disc.net.C)
     ]));
     wrap.appendChild(stylePanel);
     wrap.appendChild(h("hr",{class:"rule"}));
@@ -398,7 +433,7 @@ function initTool(DATA){
     areaScores.forEach(a => table.appendChild(h("tr", {}, [
       h("td", {}, [a.name]),
       h("td", {class:"muted small"}, [bandFor(a.score, DATA.areaBands)]),
-      h("td", {class:"num"}, [a.answered ? a.score.toFixed(1) : "–"])
+      h("td", {class:"num"}, [a.answered ? a.score.toFixed(1) : "â€“"])
     ])));
     wrap.appendChild(table);
     wrap.appendChild(h("hr",{class:"rule"}));
@@ -418,28 +453,32 @@ function initTool(DATA){
 
     // actions
     const row = h("div", {class:"btn-row"});
-    row.appendChild(h("button", {class:"btn", onclick:()=>sendResults(areaScores, overall, overallBand, disc)}, [DATA.copy.sendButton || "Send my results to Emperico"]));
-    row.appendChild(h("button", {class:"btn btn-ghost", onclick:()=>window.print()}, ["Print / save as PDF"]));
+    row.appendChild(h("button", {class:"btn", onclick:()=>window.print()}, ["Print / save as PDF"]));
+    row.appendChild(h("button", {class:"btn btn-ghost", onclick:()=>sendResults(areaScores, overall, overallBand, disc)}, ["Resend by email"]));
     row.appendChild(h("button", {class:"btn btn-ghost", onclick:()=>copySummary(areaScores, overall, overallBand, disc)}, [DATA.copy.copySummaryLabel || "Copy summary"]));
     row.appendChild(h("button", {class:"btn btn-ghost", onclick:resetState}, ["Start over"]));
     wrap.appendChild(row);
-    const note = h("p", {id:"resend-note", class:"small muted", style:"margin-top:14px;"}, [""]);
-    wrap.appendChild(note);
 
     main.appendChild(wrap);
+
+    if(!state.resultsSent){
+      state.resultsSent = true;
+      saveState();
+      sendResults(areaScores, overall, overallBand, disc);
+    }
   }
   function fmtNet(n){ return (n>0?"+":"") + n; }
 
   function buildSummaryText(areaScores, overall, overallBand, disc){
     const lines = [];
-    lines.push(DATA.title + " — results");
-    lines.push("Edition: " + (DATA.editions ? DATA.editions[state.edition].label : "—"));
-    lines.push("Overall: " + overall.toFixed(1) + "/5 — " + overallBand);
+    lines.push(DATA.title + " â€” results");
+    lines.push("Edition: " + (DATA.editions ? DATA.editions[state.edition].label : "â€”"));
+    lines.push("Overall: " + overall.toFixed(1) + "/5 â€” " + overallBand);
     lines.push("");
-    areaScores.forEach(a => lines.push(a.name + ": " + (a.answered?a.score.toFixed(1):"–") + "/5 — " + bandFor(a.score, DATA.areaBands)));
+    areaScores.forEach(a => lines.push(a.name + ": " + (a.answered?a.score.toFixed(1):"â€“") + "/5 â€” " + bandFor(a.score, DATA.areaBands)));
     lines.push("");
     const label = disc.tiedPrimary.length>1 ? disc.tiedPrimary.map(k=>DISC_STYLES[k].name).join("-")+" blend" : DISC_STYLES[disc.primary].name;
-    lines.push("Working style: " + label + " (net: D " + fmtNet(disc.net.D) + " · I " + fmtNet(disc.net.I) + " · S " + fmtNet(disc.net.S) + " · C " + fmtNet(disc.net.C) + ")");
+    lines.push("Working style: " + label + " (net: D " + fmtNet(disc.net.D) + " Â· I " + fmtNet(disc.net.I) + " Â· S " + fmtNet(disc.net.S) + " Â· C " + fmtNet(disc.net.C) + ")");
     const reflectionsWithText = DATA.copy.reflections.filter(r => (state.reflections[r.id]||"").trim().length);
     if(reflectionsWithText.length){
       lines.push("");
@@ -448,16 +487,24 @@ function initTool(DATA){
     return lines.join("\n");
   }
   function sendResults(areaScores, overall, overallBand, disc){
-    const body = buildSummaryText(areaScores, overall, overallBand, disc);
-    const subject = encodeURIComponent(DATA.title + " — results");
-    const mailto = "mailto:" + (DATA.emailTo || "mark@empericogroup.com") + "?subject=" + subject + "&body=" + encodeURIComponent(body);
-    window.location.href = mailto;
-    if(DATA.resultsEndpoint){
-      fetch(DATA.resultsEndpoint, {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ tool: DATA.toolId, edition: state.edition, answers: state.answers, disc: state.disc, reflections: state.reflections, overall, overallBand })
-      }).catch(()=>{});
-    }
+    const summary = buildSummaryText(areaScores, overall, overallBand, disc);
+    const subject = DATA.title + " â€” your results";
+    const note = document.getElementById("resend-note");
+    if(note) note.textContent = "Sending your results to " + state.email + "â€¦";
+    fetch(DATA.resultsEndpoint || "/api/send-results", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ email: state.email, tool: DATA.title, subject, summary })
+    }).then(r => r.json().catch(()=>({})).then(data => ({ok: r.ok && data.ok, data})))
+      .then(({ok, data})=>{
+        if(!note) return;
+        note.textContent = ok
+          ? "Your results have been emailed to " + state.email + "."
+          : "Couldn't send the email automatically" + (data && data.error ? " (" + data.error + ")" : "") + " â€” try again, or use Print / Copy below.";
+      })
+      .catch(()=>{
+        if(note) note.textContent = "Couldn't reach the email service â€” try again, or use Print / Copy below.";
+      });
   }
   function copySummary(areaScores, overall, overallBand, disc){
     const text = buildSummaryText(areaScores, overall, overallBand, disc);
@@ -465,7 +512,7 @@ function initTool(DATA){
     navigator.clipboard.writeText(text).then(()=>{
       if(note) note.textContent = "Summary copied to clipboard.";
     }).catch(()=>{
-      if(note) note.textContent = "Couldn't copy automatically — select and copy the text from your email draft instead.";
+      if(note) note.textContent = "Couldn't copy automatically â€” select and copy the text from your email draft instead.";
     });
   }
 
@@ -480,17 +527,19 @@ function initTool(DATA){
 
   // ---------- main render ----------
   function render(){
+    if(!state.email && state.screen !== "gate"){ state.screen = "gate"; }
     app.innerHTML = "";
     app.appendChild(renderTopbar());
     const main = h("main", {});
-    if(state.screen === "intro") renderIntro(main);
+    if(state.screen === "gate") renderGate(main);
+    else if(state.screen === "intro") renderIntro(main);
     else if(state.screen === "area") renderAreaScreen(main);
     else if(state.screen === "disc") renderDisc(main);
     else if(state.screen === "reflect") renderReflections(main);
     else if(state.screen === "report") renderReport(main);
     app.appendChild(main);
     const footer = h("div", {class:"footer-mark wrap"}, [
-      "Emperico Partner Diagnostics" + (DATA.editions ? " · " + DATA.editions[state.edition].footerMark : "")
+      "Emperico Partner Diagnostics" + (DATA.editions ? " Â· " + DATA.editions[state.edition].footerMark : "")
     ]);
     app.appendChild(footer);
   }

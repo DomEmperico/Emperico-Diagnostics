@@ -1186,7 +1186,16 @@ function showResults(){
     }
   });
 
-  window._results = {scores, overall, name, role, line, date, refl};
+  const whereToStart = devAreas.map(s=>{
+    const d = DIMS[s.di], b = bandFor(s.score);
+    const low = d.items.map((it,ii)=>({it, v:answers[s.di+"-"+ii]})).sort((a,b)=>a.v-b.v).slice(0,2);
+    return { area:d.name, score:fmt(s.score), band:b.label, bandDesc:b.desc, bandKey:b.key, lowest:low, suggestions:d.suggestions||[] };
+  });
+  const strengthsOut = strengths.map(s=>{
+    const d = DIMS[s.di], b = bandFor(s.score);
+    return { area:d.name, score:fmt(s.score), band:b.label, bandKey:b.key };
+  });
+  window._results = {scores, overall, name, role, line, date, refl, style: computeStyle(), whereToStart, strengthsList: strengthsOut};
   postResults();
 }
 
@@ -1247,7 +1256,10 @@ function postResults(){
         token: LINK_TOKEN,
         name:r.name, role:r.role, line:r.line, date:r.date,
         overall:fmt(r.overall),
-        scores:r.scores.map(s=>({area:s.name, score:fmt(s.score), band:bandFor(s.score).label})),
+        scores:r.scores.map(s=>({area:s.name, score:fmt(s.score), band:bandFor(s.score).label, bandKey:bandFor(s.score).key})),
+        style: r.style ? { label:r.style.label, net:r.style.net, summaryLine:r.style.summaryLine } : null,
+        whereToStart: r.whereToStart || [],
+        strengths: r.strengthsList || [],
         answers, reflections:r.refl,
         summary: buildSummaryText(true)
       })

@@ -13,7 +13,7 @@
 
    Requires:
      - a KV namespace bound as env.LINKS
-     - a secret env.ADMIN_PASSWORD
+     - a secret env.Admin
 */
 
 const TOOL_FILES = {

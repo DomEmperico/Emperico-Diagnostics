@@ -17,12 +17,12 @@
 */
 
 const TOOL_FILES = {
-  "partner-track:A": "/tools/partner-track-a.html",
-  "partner-track:B": "/tools/partner-track-b.html",
-  "practising-partner:A": "/tools/practising-partner-a.html",
-  "practising-partner:B": "/tools/practising-partner-b.html",
-  "firm-leader:A": "/tools/firm-leader-a.html",
-  "firm-leader:B": "/tools/firm-leader-b.html"
+  "partner-track:A": "/tools/partner-track-a",
+  "partner-track:B": "/tools/partner-track-b",
+  "practising-partner:A": "/tools/practising-partner-a",
+  "practising-partner:B": "/tools/practising-partner-b",
+  "firm-leader:A": "/tools/firm-leader-a",
+  "firm-leader:B": "/tools/firm-leader-b"
 };
 
 const SESSION_COOKIE = "es_session";
@@ -62,7 +62,7 @@ export default {
     }
 
     if (path === "/admin") {
-      return env.ASSETS.fetch(new Request(new URL("/admin.html", url), request));
+      return env.ASSETS.fetch(new Request(new URL("/admin", url), request));
     }
 
     return env.ASSETS.fetch(request);

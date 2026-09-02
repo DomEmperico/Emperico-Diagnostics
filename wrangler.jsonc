@@ -1,1 +1,9 @@
-{ "name": "emperico-diagnostics", "compatibility_date": "2025-01-01", "assets": { "directory": "./" } }
+{
+  "name": "emperico-diagnostics",
+  "compatibility_date": "2025-01-01",
+  "main": "worker.js",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS"
+  }
+}

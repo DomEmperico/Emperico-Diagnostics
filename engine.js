@@ -455,7 +455,9 @@ function initTool(DATA){
  const row = h("div", {class:"btn-row"});
  row.appendChild(h("button", {class:"btn", onclick:()=>window.print()}, ["Print / save as PDF"]));
  row.appendChild(h("button", {class:"btn btn-ghost", onclick:()=>sendResults(areaScores, overall, overallBand, disc)}, ["Resend by email"]));
- row.appendChild(h("button", {class:"btn btn-ghost", onclick:()=>copySummary(areaScores, overall, overallBand, disc)}, [DATA.copy.copySummaryLabel || "Copy summary"]));
+ const copyBtn = h("button", {class:"btn btn-ghost"}, [DATA.copy.copySummaryLabel || "Copy summary"]);
+ copyBtn.addEventListener("click", ()=>copySummary(areaScores, overall, overallBand, disc, copyBtn));
+ row.appendChild(copyBtn);
  row.appendChild(h("button", {class:"btn btn-ghost", onclick:resetState}, ["Start over"]));
  wrap.appendChild(row);
 
@@ -500,19 +502,25 @@ function initTool(DATA){
  if(!note) return;
  note.textContent = ok
  ? "Your results have been emailed to " + state.email + "."
- : "Couldn't send the email automatically" + (data && data.error ? " (" + data.error + ")" : "") + " - try again, or use Print / Copy below.";
+ : "Couldn't send the email automatically" + (data && data.error ? " (" + data.error + (data.detail ? ": " + String(data.detail).slice(0,200) : "") + ")" : "") + " - try again, or use Print / Copy below.";
  })
  .catch(()=>{
  if(note) note.textContent = "Couldn't reach the email service - try again, or use Print / Copy below.";
  });
  }
- function copySummary(areaScores, overall, overallBand, disc){
+ function copySummary(areaScores, overall, overallBand, disc, btn){
  const text = buildSummaryText(areaScores, overall, overallBand, disc);
- const note = document.getElementById("resend-note");
+ const original = btn ? btn.textContent : null;
+ const flash = (label)=>{
+ if(!btn) return;
+ btn.textContent = label;
+ btn.disabled = true;
+ setTimeout(()=>{ btn.textContent = original; btn.disabled = false; }, 1800);
+ };
  navigator.clipboard.writeText(text).then(()=>{
- if(note) note.textContent = "Summary copied to clipboard.";
+ flash("Copied!");
  }).catch(()=>{
- if(note) note.textContent = "Couldn't copy automatically - select and copy the text from your email draft instead.";
+ flash("Couldn't copy");
  });
  }
 

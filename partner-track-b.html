@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Emperico Partner Readiness Edition B",
+  "schemaVersion": 1,
+  "description": "Emperico Partner Readiness Diagnostic — Edition B (for PE/corporate-backed firms: ownership notion reframed as leadership/responsibility; distinction not overt in the text). Otherwise identical to Edition A, including results-to-Emperico email button.",
+  "mcpTools": [],
+  "mcpServerNames": []
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emperico — Partner Readiness Diagnostic</title>
+<style>
+  :root{
+    color-scheme: light;
+    /* ——— Emperico brand scheme: deep navy · antique gold · warm paper ——— */
+    --navy:#0d1c39;
+    --navy-2:#1c3158;
+    --navy-3:#41547e;
+    --gold:#a08243;
+    --gold-deep:#8a6f36;
+    --gold-pale:#e7dcc2;
+    --paper:#f3efe6;
+    --surface:#fdfbf6;
+    --ink:#23242a;
+    --ink-2:#5b5952;
+    --muted:#8c887b;
+    --hairline:#ddd5c2;
+    --grid:#e8e1d1;
+    --est:#2e6b34;
+    --rdy:#1c3158;
+    --emg:#95600f;
+    --pri:#a83232;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:"Avenir Next",Avenir,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.6;font-size:16px;
+  }
+  .serif{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif}
+  .shell{max-width:820px;margin:0 auto;padding:34px 22px 70px}
+
+  /* ———————————————— masthead ———————————————— */
+  header.masthead{text-align:center;margin-bottom:34px}
+  .logo{width:210px;max-width:60vw;height:auto;display:inline-block}
+  .logo .bridge{fill:var(--gold)}
+  .logo .word{fill:var(--navy)}
+  .logo-dark .bridge{fill:var(--gold)}
+  .logo-dark .word{fill:#f2ecdd}
+  .masthead .rule{
+    width:210px;margin:16px auto 14px;border-top:1px solid var(--gold);
+    border-bottom:1px solid var(--gold);height:4px;
+  }
+  .masthead .tool{
+    font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--ink-2);
+    margin-left:.34em;
+  }
+  .masthead .series{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:6px;margin-left:.14em}
+
+  /* ———————————————— progress ———————————————— */
+  .progress{margin:0 0 26px;display:none}
+  .progress .track{height:3px;background:var(--hairline)}
+  .progress .fill{height:100%;width:0;background:var(--navy);transition:width .3s}
+  .progress .meta{display:flex;justify-content:space-between;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+
+  /* ———————————————— panels ———————————————— */
+  .panel{
+    background:var(--surface);border:1px solid var(--hairline);border-top:3px solid var(--navy);
+    padding:38px 42px 34px;
+  }
+  .kicker{font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:14px}
+  h1{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-weight:400;
+     font-size:31px;color:var(--navy);line-height:1.25;margin-bottom:16px}
+  h2{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-weight:400;
+     font-size:24px;color:var(--navy);margin-bottom:6px}
+  p.lead{color:var(--ink-2);margin-bottom:14px;font-size:15.5px}
+  .epigraph{
+    font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-style:italic;
+    font-size:16.5px;color:var(--gold-deep);line-height:1.55;
+    border-top:1px solid var(--gold-pale);border-bottom:1px solid var(--gold-pale);
+    padding:14px 2px;margin:4px 0 20px;
+  }
+  .dim-intro{color:var(--ink-2);font-size:14.5px;margin:4px 0 20px;font-style:italic;
+     font-family:"Palatino Linotype",Palatino,Georgia,serif}
+
+  /* ———————————————— intro fields ———————————————— */
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0 8px}
+  .fields label{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);display:block;margin-bottom:5px}
+  .fields input{
+    width:100%;padding:10px 12px;border:1px solid var(--hairline);background:#fff;
+    font:inherit;font-size:15px;color:var(--ink);border-radius:0;
+  }
+  .fields input:focus{outline:none;border-color:var(--gold);box-shadow:0 1px 0 var(--gold)}
+  .note{font-size:13.5px;color:var(--muted);margin-top:16px;border-left:2px solid var(--gold-pale);padding-left:12px}
+
+  /* ———————————————— scale legend ———————————————— */
+  .scale-legend{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--hairline);
+    border:1px solid var(--hairline);margin:18px 0 6px;font-size:11.5px;color:var(--ink-2);text-align:center;
+  }
+  .scale-legend .cell{background:var(--surface);padding:8px 4px;line-height:1.35}
+  .scale-legend .cell b{display:block;font-family:Palatino,Georgia,serif;color:var(--navy);font-size:15px;margin-bottom:1px}
+
+  /* ———————————————— items ———————————————— */
+  .item{padding:18px 0 16px;border-top:1px solid var(--grid)}
+  .item:first-of-type{border-top:none}
+  .item .stmt{margin-bottom:10px;font-size:15.5px}
+  .item .stmt .num{font-family:Palatino,Georgia,serif;color:var(--gold-deep);font-size:13.5px;margin-right:8px}
+  .opts{display:flex;gap:6px}
+  .opts button{
+    flex:1;padding:8px 0;border:1px solid var(--hairline);background:#fff;border-radius:0;
+    font:inherit;font-size:14.5px;color:var(--ink-2);cursor:pointer;transition:.12s;
+  }
+  .opts button:hover{border-color:var(--gold);color:var(--navy)}
+  .opts button.sel{background:var(--navy);border-color:var(--navy);color:#f2ecdd;font-weight:600;box-shadow:inset 0 -2px 0 var(--gold)}
+  .item.unanswered .stmt{color:var(--pri)}
+
+  /* ———————————————— reflections ———————————————— */
+  textarea{
+    width:100%;min-height:96px;padding:11px 13px;border:1px solid var(--hairline);border-radius:0;
+    font:inherit;font-size:15px;resize:vertical;background:#fff;color:var(--ink);
+  }
+  textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 1px 0 var(--gold)}
+  .refl-block{margin-bottom:20px}
+  .refl-block label{display:block;font-size:15px;margin-bottom:7px;color:var(--ink)}
+
+  /* ———————————————— nav / buttons ———————————————— */
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:30px;gap:12px}
+  .btn{
+    padding:12px 26px;border-radius:0;font:inherit;font-size:13px;font-weight:600;
+    letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:.15s;
+  }
+  .btn.primary{background:var(--navy);color:#f2ecdd;border:1px solid var(--navy)}
+  .btn.primary:hover{background:var(--navy-2);border-color:var(--navy-2);box-shadow:inset 0 -2px 0 var(--gold)}
+  .btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--hairline)}
+  .btn.ghost:hover{border-color:var(--gold);color:var(--gold-deep)}
+  .warn-msg{color:var(--pri);font-size:13.5px;display:none;margin-top:14px}
+
+  /* ———————————————— results ———————————————— */
+  .hero{
+    background:var(--navy);color:#f2ecdd;padding:34px 40px 30px;margin-bottom:26px;
+    border-bottom:3px solid var(--gold);
+  }
+  .hero .hero-kicker{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  .hero-grid{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:center}
+  .hero .score{font-family:Palatino,Georgia,serif;font-size:58px;line-height:1;color:#fff}
+  .hero .score small{font-size:20px;color:#9aa5bd}
+  .hero .band-label{font-family:Palatino,Georgia,serif;font-size:22px;color:#fff;margin-bottom:6px}
+  .hero .band-desc{font-size:14px;color:#c8cede;line-height:1.55}
+  .meta-line{font-size:13px;letter-spacing:.06em;color:var(--ink-2);margin-bottom:24px;text-align:center;text-transform:uppercase}
+
+  .tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;white-space:nowrap}
+  .tag::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px}
+  .tag.established{color:var(--est)} .tag.established::before{background:var(--est)}
+  .tag.ready{color:var(--rdy)} .tag.ready::before{background:var(--rdy)}
+  .tag.emerging{color:var(--emg)} .tag.emerging::before{background:var(--emg)}
+  .tag.priority{color:var(--pri)} .tag.priority::before{background:var(--pri)}
+
+  .res-panel{background:var(--surface);border:1px solid var(--hairline);border-top:3px solid var(--navy);padding:30px 34px;margin-bottom:26px}
+  .res-panel > .kicker{margin-bottom:8px}
+
+  /* chart */
+  .viz-sub{font-size:13px;color:var(--muted);margin:2px 0 20px}
+  .chart{position:relative}
+  .chart .row{display:grid;grid-template-columns:185px 1fr;align-items:center;gap:14px;padding:6px 0;position:relative;z-index:1}
+  .chart .rowlabel{font-size:13.5px;color:var(--ink-2);text-align:right;line-height:1.3}
+  .chart .barwrap{position:relative;height:16px}
+  .chart .bar{position:absolute;left:0;top:2px;height:12px;background:var(--navy-2);border-radius:0 4px 4px 0;min-width:2px;transition:width .5s}
+  .chart .row:hover .bar{background:var(--navy)}
+  .chart .val{position:absolute;top:-2px;font-size:12.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+  .chart .axis{display:grid;grid-template-columns:185px 1fr;gap:14px;margin-top:8px}
+  .chart .ticks{position:relative;height:16px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .chart .tick{position:absolute;transform:translateX(-50%)}
+  .tooltip{
+    position:absolute;z-index:5;background:var(--navy);color:#f2ecdd;font-size:12.5px;
+    padding:8px 11px;pointer-events:none;display:none;max-width:250px;line-height:1.45;
+    border-bottom:2px solid var(--gold);box-shadow:0 3px 12px rgba(13,28,57,.28);
+  }
+
+  .dev-area{border:1px solid var(--grid);border-left:3px solid var(--gold);padding:18px 20px;margin:14px 0}
+  .dev-area h4{font-family:Palatino,Georgia,serif;font-weight:400;font-size:18px;color:var(--navy);
+    display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .dev-area .band-note{font-size:14px;color:var(--ink-2);margin-top:5px}
+  .dev-area .lowitems{font-size:14px;color:var(--ink-2);margin:10px 0 4px}
+  .dev-area .lowitems em{font-style:normal;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .dev-area .lowitems li{margin:4px 0 4px 18px}
+  .dev-area .sugg-kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-deep);margin-top:12px}
+  .dev-area .sugg{font-size:14px;margin-top:6px}
+  .dev-area .sugg li{margin:5px 0 5px 18px}
+
+  .strength-line{padding:11px 0;border-top:1px solid var(--grid);display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:15px}
+  .strength-line:first-of-type{border-top:none}
+  .strength-line .sc{font-family:Palatino,Georgia,serif;font-size:17px;color:var(--navy);font-variant-numeric:tabular-nums}
+
+  table.detail{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+  table.detail th{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-align:left;padding:9px 8px;border-bottom:1px solid var(--gold);font-weight:600}
+  table.detail td{padding:9px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+  table.detail td.sc{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+
+  .refl-echo{background:var(--paper);border:1px solid var(--grid);padding:15px 17px;margin:12px 0}
+  .refl-echo .q{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:5px}
+  .refl-echo .a{font-size:14.5px;white-space:pre-wrap}
+
+  .steps p{margin-bottom:11px;font-size:15px}
+  .steps b{color:var(--navy)}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+  .copied{color:var(--est);font-size:13.5px;align-self:center;display:none}
+
+  footer.colophon{margin-top:44px;text-align:center;font-size:12px;color:var(--muted);line-height:1.7}
+  footer .flogo{width:110px;opacity:.85;margin-bottom:10px}
+  footer .flogo .bridge{fill:var(--gold)}
+  footer .flogo .word{fill:var(--navy-3)}
+
+  .screen{display:none}
+  .screen.active{display:block;animation:fade .25s}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media(max-width:640px){
+    .panel,.res-panel{padding:24px 20px}
+    .hero{padding:24px 22px}
+    .fields{grid-template-columns:1fr}
+    .hero-grid{grid-template-columns:1fr;gap:14px}
+    .chart .row,.chart .axis{grid-template-columns:110px 1fr}
+    .chart .rowlabel{font-size:11.5px}
+    .scale-legend{font-size:9.5px}
+  }
+  @media print{
+    body{background:#fff}
+    .shell{max-width:100%;padding:0}
+    .progress,.nav,.actions,.noprint{display:none !important}
+    .panel,.res-panel,.hero{box-shadow:none;break-inside:avoid}
+    .hero,.chart .bar,.tag::before,.opts button.sel{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+
+  /* ———— working style module ———— */
+  .sblock{padding:17px 0 15px;border-top:1px solid var(--grid)}
+  .sblock:first-of-type{border-top:none}
+  .sblock .stem{margin-bottom:8px;font-size:15.5px}
+  .sblock .stem .num{font-family:Palatino,Georgia,serif;color:var(--gold-deep);font-size:13.5px;margin-right:8px}
+  .sgrid{display:grid;grid-template-columns:1fr 56px 56px;gap:2px 8px;align-items:center}
+  .sgrid .shead{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);text-align:center;padding-bottom:2px}
+  .sstmt{font-size:14.5px;color:var(--ink-2);padding:5px 0}
+  .mlbtn{width:26px;height:26px;border-radius:50%;border:1px solid var(--hairline);background:transparent;cursor:pointer;margin:0 auto;display:block;transition:.12s;padding:0}
+  .mlbtn:hover{border-color:var(--gold)}
+  .mlbtn.sel-most{background:var(--navy-2);border-color:var(--navy-2)}
+  .mlbtn.sel-least{background:var(--muted);border-color:var(--muted)}
+  .sblock.unanswered .stem{color:var(--pri)}
+  .style-hero{display:flex;gap:22px;align-items:baseline;flex-wrap:wrap;margin:6px 0 10px}
+  .style-name{font-family:Palatino,Georgia,serif;font-size:26px;color:var(--gold-deep)}
+  .style-counts{margin:14px 0 6px}
+  .style-counts .srow{display:grid;grid-template-columns:130px 1fr 44px;gap:12px;align-items:center;padding:3px 0}
+  .style-counts .slabel{font-size:13px;color:var(--ink-2);text-align:right}
+  .style-counts .strack{height:10px;background:var(--grid);position:relative}
+  .style-counts .strack::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--hairline)}
+  .style-counts .sfill{position:absolute;left:0;top:0;bottom:0;background:var(--navy-2);border-radius:0 3px 3px 0}
+  .style-counts .snum{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .style-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:14px 0 4px}
+  .style-cols h5{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:6px;font-weight:600}
+  .style-cols p{font-size:14px;color:var(--ink-2)}
+  .style-coach{border:1px solid var(--grid);border-left:3px solid var(--gold);padding:14px 17px;margin-top:14px;font-size:14.5px}
+  .style-caveat{font-size:12.5px;color:var(--muted);margin-top:12px;font-style:italic;font-family:Palatino,Georgia,serif}
+  @media(max-width:640px){.style-cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <svg class="logo" viewBox="0 0 1540 454" aria-label="Emperico">
+      <g transform="translate(-16.225463,487.822967) scale(0.1,-0.1)">
+        <g class="bridge"><path d="M7890 4874 c-207 -16 -361 -26 -508 -34 -174 -9 -379 -27 -632 -56
+-74 -8 -180 -19 -235 -24 -55 -6 -127 -14 -160 -20 -33 -5 -105 -14 -160 -20
+-109 -11 -243 -30 -430 -60 -66 -10 -145 -22 -175 -25 -30 -4 -71 -11 -90 -15
+-19 -5 -75 -14 -125 -19 -49 -6 -126 -17 -170 -25 -44 -8 -132 -24 -195 -35
+-278 -48 -361 -63 -450 -82 -152 -32 -278 -59 -385 -85 -96 -22 -212 -49 -340
+-79 -33 -8 -91 -21 -130 -29 -137 -30 -471 -107 -550 -128 -162 -42 -223 -58
+-350 -94 -71 -20 -188 -51 -260 -69 -320 -81 -770 -210 -1060 -305 -115 -37
+-256 -82 -312 -100 -100 -30 -126 -48 -116 -77 8 -23 96 -5 313 67 191 62 251
+79 655 185 138 36 275 72 305 80 30 8 123 32 205 54 146 38 224 57 525 127
+262 62 314 75 390 94 41 11 93 22 115 26 22 3 56 11 75 16 19 6 62 17 95 24
+33 7 98 22 145 33 47 11 155 34 240 51 85 17 196 40 245 50 50 10 108 21 130
+25 22 3 69 12 105 20 36 7 119 23 185 35 66 12 167 30 225 40 58 10 161 29
+230 40 69 12 159 29 200 37 41 8 120 20 175 28 55 7 165 23 245 34 80 11 157
+22 170 25 14 4 90 13 170 21 80 8 186 19 235 24 175 20 502 51 635 61 74 5
+182 14 240 19 606 55 1752 49 2440 -13 296 -27 384 -35 480 -45 52 -6 145 -15
+205 -20 174 -16 300 -31 445 -52 216 -32 439 -68 515 -84 39 -8 131 -26 205
+-40 74 -14 162 -32 195 -40 33 -8 105 -24 160 -35 55 -12 141 -30 190 -41 50
+-10 135 -28 190 -39 248 -51 627 -141 784 -187 47 -14 136 -38 196 -53 280
+-72 405 -110 910 -279 206 -70 241 -79 254 -67 20 21 8 42 -37 65 -37 19 -410
+151 -582 206 -47 15 -130 42 -185 60 -55 18 -165 52 -245 75 -80 23 -172 51
+-205 61 -159 48 -1071 281 -1255 319 -58 13 -142 31 -186 41 -45 11 -95 19
+-111 19 -16 0 -52 6 -79 14 -27 8 -69 17 -94 21 -25 3 -90 15 -145 25 -55 10
+-161 28 -235 40 -74 12 -187 30 -250 40 -352 58 -889 117 -1405 156 -203 16
+-1426 29 -1575 18z"/>
+<path d="M7725 4314 c-391 -37 -759 -150 -1025 -313 -19 -11 -46 -27 -60 -34
+-253 -125 -596 -466 -805 -802 -75 -120 -39 -171 41 -58 211 298 408 498 609
+620 257 156 374 206 595 255 160 35 575 33 730 -4 459 -111 826 -395 1059
+-819 64 -117 22 -107 446 -109 204 -1 376 -1 383 -1 61 4 -132 380 -297 579
+-258 310 -634 544 -1016 631 -219 50 -482 72 -660 55z"/>
+<path d="M4035 3960 c-418 -24 -938 -230 -1299 -516 -28 -22 -71 -54 -96 -71
+-123 -84 -335 -297 -328 -331 6 -30 25 -22 116 47 599 453 1243 601 1762 403
+224 -85 336 -172 547 -426 l21 -26 367 0 c335 0 366 1 372 17 19 50 -199 386
+-329 508 -335 314 -645 422 -1133 395z"/>
+<path d="M11280 3960 c-41 -5 -103 -16 -137 -25 -35 -8 -93 -22 -130 -31 -74
+-18 -233 -68 -261 -83 -9 -5 -46 -23 -82 -41 -86 -42 -213 -127 -327 -218
+-204 -162 -456 -492 -376 -492 12 0 36 23 66 63 134 184 404 394 640 501 385
+174 901 159 1292 -37 151 -75 343 -241 487 -421 44 -55 93 -108 107 -116 21
+-12 89 -15 379 -18 415 -4 391 -15 279 126 -341 426 -711 658 -1227 768 -129
+28 -561 42 -710 24z"/></g>
+        <g class="word"><path d="M12366 1839 c-430 -59 -735 -273 -817 -574 -26 -98 -26 -257 1 -345
+67 -216 256 -392 530 -493 262 -97 613 -112 880 -37 215 60 230 69 238 150 5
+60 -6 64 -65 24 -53 -36 -124 -67 -234 -100 -136 -42 -437 -42 -565 -2 -223
+71 -357 210 -427 443 -28 96 -31 310 -4 405 75 265 284 424 604 460 232 25
+512 -39 607 -139 51 -53 66 -43 66 44 0 90 -2 92 -180 137 -107 28 -131 30
+-340 33 -124 2 -256 -1 -294 -6z"/>
+<path d="M14335 1835 c-540 -87 -842 -440 -746 -873 56 -249 224 -427 501
+-531 421 -157 974 -82 1244 169 165 153 233 317 223 540 -10 236 -93 383 -291
+514 -108 72 -139 86 -285 135 -182 61 -441 79 -646 46z m488 -99 c150 -58 210
+-103 284 -215 149 -224 156 -588 14 -811 -140 -222 -344 -310 -647 -279 -276
+28 -438 158 -525 419 -35 108 -39 355 -6 480 58 224 145 323 354 402 87 33
+124 37 298 34 145 -3 167 -6 228 -30z"/>
+<path d="M654 1832 c-536 -2 -510 1 -477 -70 26 -57 33 -1169 8 -1258 -10 -32
+-18 -72 -19 -87 l-1 -29 615 2 c467 1 618 4 626 13 18 19 37 108 25 120 -6 6
+-37 2 -88 -12 -69 -20 -117 -24 -439 -33 -198 -6 -372 -8 -387 -4 l-27 6 0
+294 c0 243 2 296 14 306 13 10 590 9 691 -2 29 -3 30 -1 38 51 13 78 5 84
+-113 71 -140 -14 -603 -13 -618 2 -21 21 -17 512 4 533 33 33 739 14 807 -22
+38 -19 57 0 57 56 0 74 70 68 -716 63z"/>
+<path d="M10663 1825 c-14 -10 -14 -17 -2 -51 21 -58 21 -1297 0 -1333 -24
+-43 3 -51 170 -51 138 0 148 1 154 20 3 10 1 29 -5 41 -14 25 -22 1177 -9
+1294 4 43 3 75 -3 82 -13 16 -283 14 -305 -2z"/>
+<path d="M2209 1823 c-1 -5 -2 -78 -3 -163 -1 -112 -8 -188 -25 -275 -30 -164
+-57 -315 -81 -470 -36 -224 -72 -409 -86 -444 -31 -75 -24 -82 90 -73 l87 7 4
+175 c2 96 10 213 19 260 8 47 20 128 25 180 6 52 17 126 26 165 8 38 17 101
+20 140 3 38 8 80 11 93 7 33 40 28 59 -8 15 -30 72 -115 174 -260 75 -107 197
+-293 298 -454 17 -28 48 -82 68 -119 84 -160 101 -173 139 -105 12 20 41 71
+66 113 25 42 51 88 58 102 8 13 106 162 219 331 113 169 220 335 240 369 52
+93 63 95 74 10 10 -73 36 -219 54 -302 39 -183 80 -529 73 -620 -7 -84 -5 -85
+181 -85 156 0 173 6 153 57 -13 33 -23 92 -52 298 -11 83 -27 195 -35 250 -8
+55 -17 123 -20 150 -3 28 -14 113 -25 190 -32 234 -49 398 -43 433 9 53 -7 62
+-111 62 -52 0 -101 -6 -115 -13 -19 -10 -100 -134 -151 -232 -5 -11 -35 -60
+-65 -109 -30 -49 -55 -91 -55 -93 0 -2 -8 -16 -19 -31 -10 -15 -38 -58 -63
+-97 -25 -38 -75 -115 -112 -170 -157 -236 -170 -255 -191 -252 -17 2 -315 462
+-371 572 -8 17 -34 62 -59 100 -24 39 -71 118 -105 177 -85 148 -85 148 -231
+148 -66 0 -119 -3 -120 -7z"/>
+<path d="M4821 1816 c-8 -10 -9 -26 -2 -57 14 -58 14 -1203 1 -1284 -13 -81
+-11 -83 164 -84 162 -2 181 5 156 57 -21 41 -24 487 -3 503 11 10 35 10 106 1
+191 -24 214 -24 348 -7 380 50 558 190 563 445 4 231 -157 361 -524 424 -129
+22 -791 24 -809 2z m737 -81 c143 -34 211 -102 256 -257 21 -72 20 -108 -3
+-195 -56 -217 -240 -302 -561 -262 -47 5 -95 17 -107 25 l-23 14 0 330 c0 285
+2 331 16 344 22 22 330 23 422 1z"/>
+<path d="M6686 1643 c17 -787 12 -1150 -18 -1207 -25 -47 -25 -48 627 -48 334
+0 609 2 611 5 2 2 11 30 19 62 20 73 12 82 -52 61 -86 -28 -172 -35 -524 -42
+-261 -5 -348 -4 -353 5 -12 20 -7 583 6 598 14 17 602 19 662 2 48 -13 54 -7
+58 61 l3 55 -40 -1 c-22 0 -182 -4 -356 -9 -314 -8 -317 -7 -328 13 -15 29
+-15 528 0 538 17 10 625 5 698 -7 36 -5 77 -17 92 -26 38 -23 55 -12 63 41 14
+93 65 86 -594 86 l-578 0 4 -187z"/>
+<path d="M8720 1821 l-135 -6 3 -40 c2 -22 5 -288 8 -592 5 -517 2 -601 -22
+-755 l-6 -36 149 -4 c81 -2 154 -1 162 3 11 5 13 59 12 306 -2 327 -1 333 54
+319 14 -4 55 -9 92 -11 143 -11 115 9 274 -195 150 -192 314 -347 412 -390 41
+-18 153 -34 307 -44 121 -8 131 19 24 71 -65 32 -118 82 -265 253 -110 128
+-198 219 -263 273 -43 35 -30 49 80 86 221 76 314 183 314 361 0 208 -144 320
+-494 387 -89 17 -467 25 -706 14z m620 -92 c333 -72 352 -497 29 -620 -88 -32
+-445 -43 -470 -13 -11 14 -14 69 -15 298 -1 323 0 334 29 347 29 12 357 4 427
+-12z"/></g>
+      </g>
+    </svg>
+    <div class="rule"></div>
+    <div class="tool">Partner Readiness Diagnostic</div>
+    <div class="series">Emperico Partner Diagnostics · The Partner Track</div>
+  </header>
+
+  <div class="progress" id="progress">
+    <div class="track"><div class="fill" id="progressFill"></div></div>
+    <div class="meta"><span id="progressLabel"></span><span id="progressPct"></span></div>
+  </div>
+
+  <!-- INTRO -->
+  <section class="screen active panel" id="screen-intro">
+    <div class="kicker">Confidential Self-Assessment</div>
+    <h1>Are you ready for partnership?</h1>
+    <p class="epigraph">Distilled from thousands of hours spent working alongside partners — and those on the way to becoming them.</p>
+    <p class="lead">You are on the track to becoming a partner. The question now is not whether you are good at your job — it is whether you are ready to take responsibility for the firm itself — its growth, its people and its future. Partners are stewards of the firm's long-term success: they deliver commercial results, grow clients, develop people, lead with integrity and actively build the firm's future.</p>
+    <p class="lead">This diagnostic assesses you against the eight capability areas that define what it means to be a partner in a modern accountancy firm. It takes about 20–25 minutes. Answer as you are <strong>today</strong>, not as you intend to be — the gaps are the point. Your results are generated instantly and identify your priority development areas. Nothing is stored as you go; when you finish, you will be invited to send your results to Emperico and can print a copy for yourself.</p>
+    <div class="fields">
+      <div><label for="f-name">Your name</label><input id="f-name" type="text" autocomplete="name"></div>
+      <div><label for="f-role">Current role / grade</label><input id="f-role" type="text" placeholder="e.g. Senior Manager, Director"></div>
+      <div><label for="f-line">Service line</label><input id="f-line" type="text" placeholder="e.g. Audit, Tax, Advisory"></div>
+      <div><label for="f-date">Date</label><input id="f-date" type="date"></div>
+    </div>
+    <p class="note">Be honest rather than kind to yourself. This works best when you also ask a sponsor or mentor to complete the companion version about you and compare notes — that conversation is where the value is.</p>
+    <div class="nav"><span></span><button class="btn primary" onclick="startAssessment()">Begin the diagnostic</button></div>
+  </section>
+
+  <!-- DIMENSION SCREENS INJECTED HERE -->
+  <div id="dimScreens"></div>
+
+  <!-- WORKING STYLE -->
+  <section class="screen panel" id="screen-style">
+    <div class="kicker">Working Style</div>
+    <h2>How you tend to operate</h2>
+    <p class="dim-intro">For each situation, mark the statement <b>most</b> like you at work, and the one <b>least</b> like you. Answer quickly and instinctively — first responses are the most accurate.</p>
+    <div id="styleBlocks"></div>
+    <p class="warn-msg" id="warn-style">Please mark one “Most” and one “Least” for each highlighted question.</p>
+    <div class="nav">
+      <button class="btn ghost" onclick="goToDim(DIMS.length-1)">Back</button>
+      <button class="btn primary" onclick="nextFromStyle()">Continue to reflections</button>
+    </div>
+  </section>
+
+  <!-- REFLECTIONS -->
+  <section class="screen panel" id="screen-reflect">
+    <div class="kicker">Final Step</div>
+    <h2>In your own words</h2>
+    <p class="dim-intro">Ratings show the pattern; your words give it meaning. These answers appear in your report.</p>
+    <div class="refl-block"><label for="r1">What do you already do at a genuine partner standard — the strengths you should build your case on?</label><textarea id="r1"></textarea></div>
+    <div class="refl-block"><label for="r2">Where do you believe you most need to develop before promotion?</label><textarea id="r2"></textarea></div>
+    <div class="refl-block"><label for="r3">What support do you need from the firm, your sponsor or your coach to get there?</label><textarea id="r3"></textarea></div>
+    <div class="nav">
+      <button class="btn ghost" onclick="showStyleScreen()">Back</button>
+      <button class="btn primary" onclick="showResults()">See my results</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="screen-results"></section>
+
+  <footer class="colophon">
+    <svg class="flogo" viewBox="0 0 1540 454" aria-hidden="true">
+      <g transform="translate(-16.225463,487.822967) scale(0.1,-0.1)">
+        <g class="bridge"><path d="M7890 4874 c-207 -16 -361 -26 -508 -34 -174 -9 -379 -27 -632 -56
+-74 -8 -180 -19 -235 -24 -55 -6 -127 -14 -160 -20 -33 -5 -105 -14 -160 -20
+-109 -11 -243 -30 -430 -60 -66 -10 -145 -22 -175 -25 -30 -4 -71 -11 -90 -15
+-19 -5 -75 -14 -125 -19 -49 -6 -126 -17 -170 -25 -44 -8 -132 -24 -195 -35
+-278 -48 -361 -63 -450 -82 -152 -32 -278 -59 -385 -85 -96 -22 -212 -49 -340
+-79 -33 -8 -91 -21 -130 -29 -137 -30 -471 -107 -550 -128 -162 -42 -223 -58
+-350 -94 -71 -20 -188 -51 -260 -69 -320 -81 -770 -210 -1060 -305 -115 -37
+-256 -82 -312 -100 -100 -30 -126 -48 -116 -77 8 -23 96 -5 313 67 191 62 251
+79 655 185 138 36 275 72 305 80 30 8 123 32 205 54 146 38 224 57 525 127
+262 62 314 75 390 94 41 11 93 22 115 26 22 3 56 11 75 16 19 6 62 17 95 24
+33 7 98 22 145 33 47 11 155 34 240 51 85 17 196 40 245 50 50 10 108 21 130
+25 22 3 69 12 105 20 36 7 119 23 185 35 66 12 167 30 225 40 58 10 161 29
+230 40 69 12 159 29 200 37 41 8 120 20 175 28 55 7 165 23 245 34 80 11 157
+22 170 25 14 4 90 13 170 21 80 8 186 19 235 24 175 20 502 51 635 61 74 5
+182 14 240 19 606 55 1752 49 2440 -13 296 -27 384 -35 480 -45 52 -6 145 -15
+205 -20 174 -16 300 -31 445 -52 216 -32 439 -68 515 -84 39 -8 131 -26 205
+-40 74 -14 162 -32 195 -40 33 -8 105 -24 160 -35 55 -12 141 -30 190 -41 50
+-10 135 -28 190 -39 248 -51 627 -141 784 -187 47 -14 136 -38 196 -53 280
+-72 405 -110 910 -279 206 -70 241 -79 254 -67 20 21 8 42 -37 65 -37 19 -410
+151 -582 206 -47 15 -130 42 -185 60 -55 18 -165 52 -245 75 -80 23 -172 51
+-205 61 -159 48 -1071 281 -1255 319 -58 13 -142 31 -186 41 -45 11 -95 19
+-111 19 -16 0 -52 6 -79 14 -27 8 -69 17 -94 21 -25 3 -90 15 -145 25 -55 10
+-161 28 -235 40 -74 12 -187 30 -250 40 -352 58 -889 117 -1405 156 -203 16
+-1426 29 -1575 18z"/>
+<path d="M7725 4314 c-391 -37 -759 -150 -1025 -313 -19 -11 -46 -27 -60 -34
+-253 -125 -596 -466 -805 -802 -75 -120 -39 -171 41 -58 211 298 408 498 609
+620 257 156 374 206 595 255 160 35 575 33 730 -4 459 -111 826 -395 1059
+-819 64 -117 22 -107 446 -109 204 -1 376 -1 383 -1 61 4 -132 380 -297 579
+-258 310 -634 544 -1016 631 -219 50 -482 72 -660 55z"/>
+<path d="M4035 3960 c-418 -24 -938 -230 -1299 -516 -28 -22 -71 -54 -96 -71
+-123 -84 -335 -297 -328 -331 6 -30 25 -22 116 47 599 453 1243 601 1762 403
+224 -85 336 -172 547 -426 l21 -26 367 0 c335 0 366 1 372 17 19 50 -199 386
+-329 508 -335 314 -645 422 -1133 395z"/>
+<path d="M11280 3960 c-41 -5 -103 -16 -137 -25 -35 -8 -93 -22 -130 -31 -74
+-18 -233 -68 -261 -83 -9 -5 -46 -23 -82 -41 -86 -42 -213 -127 -327 -218
+-204 -162 -456 -492 -376 -492 12 0 36 23 66 63 134 184 404 394 640 501 385
+174 901 159 1292 -37 151 -75 343 -241 487 -421 44 -55 93 -108 107 -116 21
+-12 89 -15 379 -18 415 -4 391 -15 279 126 -341 426 -711 658 -1227 768 -129
+28 -561 42 -710 24z"/></g>
+        <g class="word"><path d="M12366 1839 c-430 -59 -735 -273 -817 -574 -26 -98 -26 -257 1 -345
+67 -216 256 -392 530 -493 262 -97 613 -112 880 -37 215 60 230 69 238 150 5
+60 -6 64 -65 24 -53 -36 -124 -67 -234 -100 -136 -42 -437 -42 -565 -2 -223
+71 -357 210 -427 443 -28 96 -31 310 -4 405 75 265 284 424 604 460 232 25
+512 -39 607 -139 51 -53 66 -43 66 44 0 90 -2 92 -180 137 -107 28 -131 30
+-340 33 -124 2 -256 -1 -294 -6z"/>
+<path d="M14335 1835 c-540 -87 -842 -440 -746 -873 56 -249 224 -427 501
+-531 421 -157 974 -82 1244 169 165 153 233 317 223 540 -10 236 -93 383 -291
+514 -108 72 -139 86 -285 135 -182 61 -441 79 -646 46z m488 -99 c150 -58 210
+-103 284 -215 149 -224 156 -588 14 -811 -140 -222 -344 -310 -647 -279 -276
+28 -438 158 -525 419 -35 108 -39 355 -6 480 58 224 145 323 354 402 87 33
+124 37 298 34 145 -3 167 -6 228 -30z"/>
+<path d="M654 1832 c-536 -2 -510 1 -477 -70 26 -57 33 -1169 8 -1258 -10 -32
+-18 -72 -19 -87 l-1 -29 615 2 c467 1 618 4 626 13 18 19 37 108 25 120 -6 6
+-37 2 -88 -12 -69 -20 -117 -24 -439 -33 -198 -6 -372 -8 -387 -4 l-27 6 0
+294 c0 243 2 296 14 306 13 10 590 9 691 -2 29 -3 30 -1 38 51 13 78 5 84
+-113 71 -140 -14 -603 -13 -618 2 -21 21 -17 512 4 533 33 33 739 14 807 -22
+38 -19 57 0 57 56 0 74 70 68 -716 63z"/>
+<path d="M10663 1825 c-14 -10 -14 -17 -2 -51 21 -58 21 -1297 0 -1333 -24
+-43 3 -51 170 -51 138 0 148 1 154 20 3 10 1 29 -5 41 -14 25 -22 1177 -9
+1294 4 43 3 75 -3 82 -13 16 -283 14 -305 -2z"/>
+<path d="M2209 1823 c-1 -5 -2 -78 -3 -163 -1 -112 -8 -188 -25 -275 -30 -164
+-57 -315 -81 -470 -36 -224 -72 -409 -86 -444 -31 -75 -24 -82 90 -73 l87 7 4
+175 c2 96 10 213 19 260 8 47 20 128 25 180 6 52 17 126 26 165 8 38 17 101
+20 140 3 38 8 80 11 93 7 33 40 28 59 -8 15 -30 72 -115 174 -260 75 -107 197
+-293 298 -454 17 -28 48 -82 68 -119 84 -160 101 -173 139 -105 12 20 41 71
+66 113 25 42 51 88 58 102 8 13 106 162 219 331 113 169 220 335 240 369 52
+93 63 95 74 10 10 -73 36 -219 54 -302 39 -183 80 -529 73 -620 -7 -84 -5 -85
+181 -85 156 0 173 6 153 57 -13 33 -23 92 -52 298 -11 83 -27 195 -35 250 -8
+55 -17 123 -20 150 -3 28 -14 113 -25 190 -32 234 -49 398 -43 433 9 53 -7 62
+-111 62 -52 0 -101 -6 -115 -13 -19 -10 -100 -134 -151 -232 -5 -11 -35 -60
+-65 -109 -30 -49 -55 -91 -55 -93 0 -2 -8 -16 -19 -31 -10 -15 -38 -58 -63
+-97 -25 -38 -75 -115 -112 -170 -157 -236 -170 -255 -191 -252 -17 2 -315 462
+-371 572 -8 17 -34 62 -59 100 -24 39 -71 118 -105 177 -85 148 -85 148 -231
+148 -66 0 -119 -3 -120 -7z"/>
+<path d="M4821 1816 c-8 -10 -9 -26 -2 -57 14 -58 14 -1203 1 -1284 -13 -81
+-11 -83 164 -84 162 -2 181 5 156 57 -21 41 -24 487 -3 503 11 10 35 10 106 1
+191 -24 214 -24 348 -7 380 50 558 190 563 445 4 231 -157 361 -524 424 -129
+22 -791 24 -809 2z m737 -81 c143 -34 211 -102 256 -257 21 -72 20 -108 -3
+-195 -56 -217 -240 -302 -561 -262 -47 5 -95 17 -107 25 l-23 14 0 330 c0 285
+2 331 16 344 22 22 330 23 422 1z"/>
+<path d="M6686 1643 c17 -787 12 -1150 -18 -1207 -25 -47 -25 -48 627 -48 334
+0 609 2 611 5 2 2 11 30 19 62 20 73 12 82 -52 61 -86 -28 -172 -35 -524 -42
+-261 -5 -348 -4 -353 5 -12 20 -7 583 6 598 14 17 602 19 662 2 48 -13 54 -7
+58 61 l3 55 -40 -1 c-22 0 -182 -4 -356 -9 -314 -8 -317 -7 -328 13 -15 29
+-15 528 0 538 17 10 625 5 698 -7 36 -5 77 -17 92 -26 38 -23 55 -12 63 41 14
+93 65 86 -594 86 l-578 0 4 -187z"/>
+<path d="M8720 1821 l-135 -6 3 -40 c2 -22 5 -288 8 -592 5 -517 2 -601 -22
+-755 l-6 -36 149 -4 c81 -2 154 -1 162 3 11 5 13 59 12 306 -2 327 -1 333 54
+319 14 -4 55 -9 92 -11 143 -11 115 9 274 -195 150 -192 314 -347 412 -390 41
+-18 153 -34 307 -44 121 -8 131 19 24 71 -65 32 -118 82 -265 253 -110 128
+-198 219 -263 273 -43 35 -30 49 80 86 221 76 314 183 314 361 0 208 -144 320
+-494 387 -89 17 -467 25 -706 14z m620 -92 c333 -72 352 -497 29 -620 -88 -32
+-445 -43 -470 -13 -11 14 -14 69 -15 298 -1 323 0 334 29 347 29 12 357 4 427
+-12z"/></g>
+      </g>
+    </svg><br>
+    Emperico Partner Diagnostics — The Partner Track · Readiness Self-Assessment · <span id="editionMark">Edition B</span><br>
+    Confidential: results are held only on this page until you choose to send or print them.
+  </footer>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+/* =========================================================
+   Emperico Partner Readiness Diagnostic — self-assessment
+   All state lives in memory; nothing is stored or sent.
+   ========================================================= */
+
+const SCALE = [
+  {v:1, s:"1", label:"Not yet true of me"},
+  {v:2, s:"2", label:"True occasionally"},
+  {v:3, s:"3", label:"True some of the time"},
+  {v:4, s:"4", label:"Consistently true"},
+  {v:5, s:"5", label:"A role model for this"}
+];
+
+const DIMS = [
+  {
+    key:"lead", name:"Lead the Business",
+    intro:"Partners take charge of the business. They drive growth, profitability and long-term value, and they work on the business — not just in it.",
+    items:[
+      "I think and act firm-wide, not just for my own team or client portfolio.",
+      "I understand and take responsibility for the commercial performance of my practice — growth, profitability and long-term value.",
+      "I focus on partner-level work and push other work down: I work on the business, not just in it.",
+      "I manage scope, WIP, billing and recoveries with commercial discipline.",
+      "I plan capacity ahead so deadlines are met without last-minute heroics.",
+      "I deliver against my agreed personal and firm goals."
+    ],
+    suggestions:[
+      "Draft a one-page personal business plan — your practice's growth, profitability and capacity story — and review it monthly with your sponsor.",
+      "Volunteer to own one firm-wide initiative this year, so you practise thinking beyond your own portfolio.",
+      "Put a fixed fortnightly slot in your diary for WIP, billing and recovery — commercial discipline is a habit, not an event."
+    ]
+  },
+  {
+    key:"grow", name:"Grow Clients & Revenue",
+    intro:"Partners bring in work. They deepen relationships, grow fees, cultivate referral sources and create opportunities for colleagues across the firm.",
+    items:[
+      "I deepen client relationships, grow fees and move clients up the value scale.",
+      "I proactively bring in new work and develop referral sources.",
+      "I create cross-firm opportunities — introducing colleagues and selling as a team.",
+      "I maintain a visible pipeline of opportunities and convert them in good time.",
+      "My key clients have multiple touch-points in the firm — they are the firm's clients, not mine alone."
+    ],
+    suggestions:[
+      "Set yourself a personal origination target and a named list of ten referral relationships to build this year — review it monthly.",
+      "Take a colleague from another service line into your next three client meetings and look deliberately for cross-service opportunities.",
+      "Start a simple pipeline list — opportunity, value, next action, date — and bring it to every sponsor conversation."
+    ]
+  },
+  {
+    key:"people", name:"Develop People",
+    intro:"Partners multiply themselves. Staff are not support — they are successors. Delegating well and growing future leaders is core partner work.",
+    items:[
+      "I mentor and grow future leaders, not just competent staff.",
+      "I delegate well and keep my teams engaged, stretched and growing.",
+      "I share knowledge, feedback and opportunity generously.",
+      "I give honest, direct feedback even when the message is difficult.",
+      "I treat staff with at least as much respect as I show my clients."
+    ],
+    suggestions:[
+      "Take on two or three formal mentees and agree development goals with each — being known for growing people is a promotion case in itself.",
+      "Audit one week of your timesheet: highlight everything someone more junior could have done with coaching, then delegate it deliberately.",
+      "Practise structured feedback: one specific, direct development conversation each week, however uncomfortable."
+    ]
+  },
+  {
+    key:"integrity", name:"Integrity & Accountability",
+    intro:"Trustworthiness is the foundation of partnership: sound judgement, high standards, reliability — doing what you say you will do, even when it is inconvenient.",
+    items:[
+      "I uphold the firm's values in my behaviour, judgement and decisions.",
+      "I maintain high ethical standards, even when it is inconvenient or costly.",
+      "My work is consistently high-quality and accurate, reflecting the firm's standards.",
+      "I do what I say I will do — I close loops and people find it easy to rely on me.",
+      "I am willing to make the call and have the hard conversation, and I am comfortable being uncomfortable."
+    ],
+    suggestions:[
+      "Ask three colleagues where they would hesitate to rely on you — reliability gaps are usually invisible to the person who has them.",
+      "Name the one hard conversation you have been avoiding, and have it within a fortnight.",
+      "Adopt a closing-loops rule: every commitment gets a who, a what and a by-when — confirmed in writing."
+    ]
+  },
+  {
+    key:"culture", name:"Cultural Leadership",
+    intro:"Culture is shaped by partner behaviour, not slogans. Partners set the tone for trust, inclusion and professionalism — and deal with issues early and directly.",
+    items:[
+      "I set the tone for trust, inclusion and professionalism.",
+      "I communicate openly, respond promptly and show respect at every level.",
+      "I support and challenge colleagues constructively.",
+      "I address issues directly and early — choosing respectful directness over politics — and don't let conflict fester.",
+      "I act on the understanding that culture is shaped by my behaviour, not by slogans."
+    ],
+    suggestions:[
+      "Ask your team anonymously what one behaviour of yours they would change — then visibly change it.",
+      "Watch your response times for a week: unanswered messages are read as disrespect, whatever you intend.",
+      "When you next feel a conflict brewing, raise it within 48 hours rather than letting it settle into politics."
+    ]
+  },
+  {
+    key:"change", name:"Champion Change",
+    intro:"Firms need partners who lead change rather than wait to be convinced — who align with strategy, back decisions and help others through transition.",
+    items:[
+      "I embrace and lead change rather than waiting to be convinced.",
+      "I help others adapt and stay positive through transitions.",
+      "I align with firm strategy and visibly back key decisions.",
+      "I support firm decisions and follow firm policy, even when I personally disagree."
+    ],
+    suggestions:[
+      "Volunteer for a visible role in a current change programme — adoption of new technology, process or structure.",
+      "When you disagree with a firm decision, say so once, in the room — then back it fully outside the room.",
+      "Identify who on your team is struggling with a current change and spend real time helping them through it."
+    ]
+  },
+  {
+    key:"steward", name:"Stewardship & Risk",
+    intro:"Partners protect the firm — its reputation, its quality standards and its future. That includes technical mastery: never doing work beyond your capability.",
+    items:[
+      "I actively protect the firm's reputation and long-term future.",
+      "I avoid clients, work or behaviour that could put the firm at risk.",
+      "I escalate concerns early and never ignore red flags or compliance issues.",
+      "I keep my technical skills sharp and current, and never take on work beyond my capability.",
+      "I treat quality and professional standards as a personal responsibility, not someone else's job."
+    ],
+    suggestions:[
+      "Run a risk review of your own portfolio: which client, engagement or habit would you least like on the front page?",
+      "Build a deliberate technical development plan for the year — partners never stop learning, and depth is a licence to lead.",
+      "Rehearse escalation: agree with your sponsor now what you would raise, to whom, and how early."
+    ]
+  },
+  {
+    key:"succession", name:"Own Succession",
+    intro:"The strongest partner case is a candidate already building their own replacement — sharing relationships, creating redundancy, thinking beyond their own tenure.",
+    items:[
+      "I am actively building my own replacement — and developing others besides.",
+      "I create redundancy in client and team leadership, so nothing depends only on me.",
+      "I share client relationships rather than guarding them.",
+      "I support others' development with generosity, not rivalry.",
+      "I think beyond my own tenure — I act as if the firm's next chapter depends on me."
+    ],
+    suggestions:[
+      "Map your top ten client relationships: who is the credible second contact for each? Fill the gaps within six months.",
+      "Pick your most likely successor and start handing over something real — a relationship, a meeting, a decision.",
+      "Reframe generosity as strategy: every leader you develop strengthens your own case for partnership."
+    ]
+  }
+];
+
+const BANDS = [
+  {min:4.2, key:"established", label:"Partner standard",
+   desc:"You are operating at or above the standard expected of an incoming partner in this area. Protect it, evidence it, and use it in your case."},
+  {min:3.4, key:"ready", label:"Approaching ready",
+   desc:"A solid foundation with specific gaps to close. Targeted work here converts 'promising' into 'ready'."},
+  {min:2.6, key:"emerging", label:"Emerging",
+   desc:"You contribute well at your current level but are not yet demonstrating this consistently at partner level. This needs a deliberate development plan."},
+  {min:0,   key:"priority", label:"Development priority",
+   desc:"A significant gap against the partner standard. Make this a headline of your development plan and discuss it openly with your sponsor."}
+];
+
+const OVERALL_BANDS = [
+  {min:4.2, label:"Operating at partner standard",
+   desc:"Your self-assessment suggests you are already demonstrating most partner capabilities consistently. The work now is evidence and visibility: make sure the people who decide can see what you see — and test this picture with a sponsor."},
+  {min:3.4, label:"Approaching readiness",
+   desc:"You have a credible foundation for a partner case, with clear priorities to close. Focus your next 6–12 months on the development areas below and revisit this diagnostic to track movement."},
+  {min:2.6, label:"Emerging candidate",
+   desc:"You are contributing strongly at your current level, and the step to partner is a genuine step. That is normal at this stage of the track — the development areas below tell you exactly where to invest."},
+  {min:0,   label:"Early on the track",
+   desc:"Today's picture shows substantial gaps to the partner standard — which is precisely what this tool is for. Use the priorities below to shape a plan with your sponsor, and re-assess in six months."}
+];
+
+/* ——— Results return ———
+   RESULTS_EMAIL: the "Send my results" button opens a pre-addressed email here.
+   RESULTS_ENDPOINT: optional. If set to a form/POST endpoint (e.g. Power
+   Automate or Formspree), results are also posted there automatically when
+   the report is generated. Leave "" to disable. */
+const RESULTS_EMAIL = "mark@empericogroup.com";
+const RESULTS_ENDPOINT = "/api/submit-results";
+const LINK_TOKEN = (typeof window !== "undefined" && window.EMPERICO_TOKEN) || "";
+
+let answers = {};
+let currentDim = -1;
+
+/* ——— Working style (original Emperico DISC-style module) ——— */
+const STYLE_BLOCKS = [
+  {stem:"In a partner or team meeting, I am usually the one who…", opts:{
+    D:"pushes for a decision so we can move.",
+    I:"brings energy and gets people talking.",
+    S:"makes sure everyone has been heard.",
+    C:"tests the detail behind the proposal."}},
+  {stem:"Under deadline pressure, I…", opts:{
+    D:"take charge and drive the pace.",
+    I:"rally people and keep spirits up.",
+    S:"stay calm and work steadily through it.",
+    C:"double-check accuracy before anything goes out."}},
+  {stem:"Clients would most readily describe me as…", opts:{
+    D:"decisive.", I:"engaging.", S:"dependable.", C:"thorough."}},
+  {stem:"When plans change late in the day…", opts:{
+    D:"I adapt fast and reset the goal.",
+    I:"I look for the upside and bring others with me.",
+    S:"I prefer proper time to adjust.",
+    C:"I want to understand exactly what changed, and why."}},
+  {stem:"My natural contribution to winning work is…", opts:{
+    D:"the confident close.",
+    I:"the relationship and the story.",
+    S:"the trust built patiently over time.",
+    C:"the well-evidenced case."}},
+  {stem:"I am most frustrated by…", opts:{
+    D:"slow decisions.",
+    I:"flat, disengaged rooms.",
+    S:"constant churn and change.",
+    C:"sloppy work."}},
+  {stem:"When I delegate, I tend to…", opts:{
+    D:"set the outcome and expect people to get on with it.",
+    I:"sell the task and make it feel worth doing.",
+    S:"hand over gradually, with plenty of support.",
+    C:"provide clear instructions and quality standards."}},
+  {stem:"In conflict, I usually…", opts:{
+    D:"address it head-on.",
+    I:"talk it out and rebuild the relationship.",
+    S:"look for common ground and calm.",
+    C:"go back to the facts and the agreed process."}},
+  {stem:"Left to its own devices, my diary fills with…", opts:{
+    D:"decisions and deadlines.",
+    I:"people.",
+    S:"the routines that work.",
+    C:"time to do things properly."}},
+  {stem:"At my best, what I bring is…", opts:{
+    D:"momentum.", I:"enthusiasm.", S:"reliability.", C:"rigour."}},
+  {stem:"When a new opportunity appears, my first instinct is…", opts:{
+    D:"to go for it.",
+    I:"to talk to people about it.",
+    S:"to consider how it fits with what we already do.",
+    C:"to examine it properly before committing."}},
+  {stem:"My emails tend to be…", opts:{
+    D:"short and to the point.",
+    I:"warm and conversational.",
+    S:"considered and personal.",
+    C:"complete and precise."}},
+  {stem:"People sometimes wish I would…", opts:{
+    D:"slow down and listen more.",
+    I:"focus and follow through.",
+    S:"push back more strongly.",
+    C:"worry less about perfection."}},
+  {stem:"In a crisis, I am the one who…", opts:{
+    D:"takes command.",
+    I:"keeps everyone together.",
+    S:"steadies the ship.",
+    C:"works out what actually happened."}},
+  {stem:"I win people's confidence through…", opts:{
+    D:"results.", I:"rapport.", S:"loyalty.", C:"expertise."}},
+  {stem:"A good week is one where…", opts:{
+    D:"big things moved forward.",
+    I:"I spent real time with people and clients.",
+    S:"everything ran smoothly.",
+    C:"the work was done properly, with no surprises."}},
+  {stem:"My appetite for risk is best described as…", opts:{
+    D:"bold — fortune favours the brave.",
+    I:"optimistic — things usually work out.",
+    S:"careful — steady compounding beats big swings.",
+    C:"measured — understood, priced and controlled."}},
+  {stem:"When reviewing someone's work, I look first at…", opts:{
+    D:"whether it achieves the objective.",
+    I:"how it will land with the audience.",
+    S:"the effort and progress behind it.",
+    C:"whether it is accurate and complete."}},
+  {stem:"What most drains me is…", opts:{
+    D:"waiting.",
+    I:"working alone for long stretches.",
+    S:"conflict.",
+    C:"winging it."}},
+  {stem:"If colleagues teased me, they would say I…", opts:{
+    D:"think I am always right.",
+    I:"never stop talking.",
+    S:"never rock the boat.",
+    C:"never let anything go."}}
+];
+
+const STYLES = {
+  D:{name:"Direct", blurb:"Direct, decisive and results-first. You bring momentum: you make the call, set the pace and keep things moving.",
+     strengths:"Pace, decisiveness, appetite for the difficult call, comfort with accountability.",
+     watch:"Listening and patience. Developing people can feel slow; directness can bruise trust and culture if left unmanaged.",
+     coach:"Your instinct will be to close development gaps by force of will. The areas that matter most at partner level — people, culture, succession — respond to patience and consistency instead. Choose fewer priorities, go slower than feels natural, and bring others with you."},
+  I:{name:"Influencing", blurb:"Energising, persuasive and people-first. You bring enthusiasm: you win people over, open doors and lift a room.",
+     strengths:"Relationships, origination, communication, optimism through change.",
+     watch:"Follow-through and detail; commercial discipline; a tendency to protect relationships by postponing hard conversations.",
+     coach:"Let your relationship strength carry business development — but put structure around your commitments: routines, lists, deadlines, closed loops. And take the difficult conversation early; handled well, it deepens a relationship rather than damaging it."},
+  S:{name:"Steady", blurb:"Calm, dependable and team-first. You bring reliability: people trust you, teams settle around you, clients stay with you.",
+     strengths:"Trust, consistency, loyalty, developing people patiently.",
+     watch:"Pace of change; visibility and self-advocacy; conversations postponed for the sake of harmony; comfort with routine over reinvention.",
+     coach:"Your consistency is a genuine platform — the stretch is pace, visibility and challenge. Volunteer for the change role before you feel ready, take the uncomfortable conversation early, and make sure the firm can actually see what you quietly deliver."},
+  C:{name:"Conscientious", blurb:"Precise, rigorous and standards-first. You bring rigour: quality holds, risk is managed, the detail is right.",
+     strengths:"Technical authority, quality, preparation, risk management.",
+     watch:"Perfectionism and pace; delegating at less than 100%; investing in relationships only when they are needed.",
+     coach:"The step up is from being right to being followed. Delegate at 80% and coach the rest, timebox analysis before decisions, and treat relationships as an investment rather than a transaction — rigour is your licence; breadth of trust is your multiplier."}
+};
+
+let styleAnswers = {};
+
+function styleDone(){ return STYLE_BLOCKS.filter((_,bi)=>styleAnswers[bi] && styleAnswers[bi].most && styleAnswers[bi].least).length; }
+function styleComplete(){ return styleDone() === STYLE_BLOCKS.length; }
+
+function buildStyleScreen(){
+  const holder = document.getElementById('styleBlocks');
+  let html = '';
+  const order = ['D','I','S','C'];
+  STYLE_BLOCKS.forEach((b,bi)=>{
+    const rot = order.slice(bi%4).concat(order.slice(0,bi%4)); // deterministic rotation
+    html += `<div class="sblock" id="sblock-${bi}">
+      <div class="stem"><span class="num">${bi+1}</span>${b.stem}</div>
+      <div class="sgrid">
+        <div></div><div class="shead">Most</div><div class="shead">Least</div>` +
+      rot.map(k=>`<div class="sstmt">${b.opts[k]}</div>
+        <button type="button" class="mlbtn" data-k="${k}" data-t="most" aria-label="Most like me: ${b.opts[k]}" onclick="pickML(${bi},'${k}','most')"></button>
+        <button type="button" class="mlbtn" data-k="${k}" data-t="least" aria-label="Least like me: ${b.opts[k]}" onclick="pickML(${bi},'${k}','least')"></button>`).join('') +
+      `</div></div>`;
+  });
+  holder.innerHTML = html;
+}
+
+function pickML(bi,k,type){
+  const a = styleAnswers[bi] = styleAnswers[bi] || {};
+  if(type==='most'){ if(a.least===k) delete a.least; a.most = k; }
+  else{ if(a.most===k) delete a.most; a.least = k; }
+  const blk = document.getElementById('sblock-'+bi);
+  blk.classList.remove('unanswered');
+  blk.querySelectorAll('.mlbtn').forEach(b=>{
+    b.classList.toggle('sel-most',  b.dataset.t==='most'  && a.most  === b.dataset.k);
+    b.classList.toggle('sel-least', b.dataset.t==='least' && a.least === b.dataset.k);
+  });
+  updateProgress();
+}
+
+function showStyleScreen(){ currentDim = DIMS.length; show('screen-style'); updateProgress(); }
+
+function nextFromStyle(){
+  const missing = STYLE_BLOCKS.map((_,bi)=>bi).filter(bi=>!(styleAnswers[bi] && styleAnswers[bi].most && styleAnswers[bi].least));
+  const warn = document.getElementById('warn-style');
+  STYLE_BLOCKS.forEach((_,bi)=>document.getElementById('sblock-'+bi).classList.remove('unanswered'));
+  if(missing.length){
+    missing.forEach(bi=>document.getElementById('sblock-'+bi).classList.add('unanswered'));
+    warn.style.display='block';
+    document.getElementById('sblock-'+missing[0]).scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  warn.style.display='none';
+  currentDim = DIMS.length+1; show('screen-reflect'); updateProgress();
+}
+
+function computeStyle(){
+  const net = {D:0,I:0,S:0,C:0};
+  Object.values(styleAnswers).forEach(a=>{ if(a.most) net[a.most]++; if(a.least) net[a.least]--; });
+  const ranked = ['D','I','S','C'].map(k=>({k, n:net[k]})).sort((a,b)=>b.n-a.n);
+  const primary = ranked[0], second = ranked[1];
+  const blended = second.n === primary.n;
+  const hasSecondary = !blended && second.n > 0 && (primary.n - second.n) <= 6;
+  let label = STYLES[primary.k].name;
+  if(blended) label = STYLES[primary.k].name + "–" + STYLES[second.k].name + " blend";
+  else if(hasSecondary) label = STYLES[primary.k].name + ", with " + STYLES[second.k].name;
+  const fmtN = n => (n>0? "+" : "") + n;
+  const summaryLine = label + " (net: D " + fmtN(net.D) + " · I " + fmtN(net.I) + " · S " + fmtN(net.S) + " · C " + fmtN(net.C) + ")";
+  return {net, primary, second, blended, hasSecondary, label, summaryLine, fmtN};
+}
+
+function buildScreens(){
+  const holder = document.getElementById('dimScreens');
+  DIMS.forEach((d,di)=>{
+    const sec = document.createElement('section');
+    sec.className = 'screen panel';
+    sec.id = 'screen-dim-'+di;
+    let html = `<div class="kicker">Capability Area ${["I","II","III","IV","V","VI","VII","VIII"][di]} of VIII</div>
+      <h2>${d.name}</h2><p class="dim-intro">${d.intro}</p>
+      <div class="scale-legend">${SCALE.map(s=>`<div class="cell"><b>${s.s}</b>${s.label}</div>`).join('')}</div>`;
+    d.items.forEach((it,ii)=>{
+      html += `<div class="item" id="item-${di}-${ii}">
+        <div class="stmt"><span class="num">${di+1}.${ii+1}</span>${it}</div>
+        <div class="opts" role="radiogroup" aria-label="${it}">` +
+        SCALE.map(s=>`<button type="button" aria-label="${s.label}" onclick="pick(${di},${ii},${s.v},this)">${s.s}</button>`).join('') +
+        `</div></div>`;
+    });
+    html += `<p class="warn-msg" id="warn-${di}">Please answer the highlighted statements before continuing.</p>
+      <div class="nav">
+        <button class="btn ghost" onclick="${di===0 ? "goIntro()" : "goToDim("+(di-1)+")"}">Back</button>
+        <button class="btn primary" onclick="nextFromDim(${di})">${di===DIMS.length-1 ? "Continue" : "Next"}</button>
+      </div>`;
+    sec.innerHTML = html;
+    holder.appendChild(sec);
+  });
+}
+
+function pick(di,ii,v,btn){
+  answers[di+"-"+ii] = v;
+  const row = document.getElementById('item-'+di+'-'+ii);
+  row.classList.remove('unanswered');
+  row.querySelectorAll('.opts button').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  updateProgress();
+}
+
+function totalItems(){ return DIMS.reduce((n,d)=>n+d.items.length,0) + STYLE_BLOCKS.length; }
+
+function updateProgress(){
+  const done = Object.keys(answers).length + styleDone();
+  const pct = Math.round(100*done/totalItems());
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressPct').textContent = pct+'% complete';
+  document.getElementById('progressLabel').textContent =
+    currentDim>=0 && currentDim<DIMS.length ? DIMS[currentDim].name :
+    (currentDim===DIMS.length ? "Working style" : currentDim===DIMS.length+1 ? "Reflections" : "");
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0});
+}
+
+function startAssessment(){
+  const d = document.getElementById('f-date');
+  if(!d.value){ d.valueAsDate = new Date(); }
+  document.getElementById('progress').style.display='block';
+  goToDim(0);
+}
+function goIntro(){ currentDim=-1; show('screen-intro'); }
+function goToDim(di){ currentDim=di; show('screen-dim-'+di); updateProgress(); }
+function nextFromDim(di){
+  const missing = DIMS[di].items.map((_,ii)=>ii).filter(ii=>!answers[di+"-"+ii]);
+  const warn = document.getElementById('warn-'+di);
+  DIMS[di].items.forEach((_,ii)=>document.getElementById('item-'+di+'-'+ii).classList.remove('unanswered'));
+  if(missing.length){
+    missing.forEach(ii=>document.getElementById('item-'+di+'-'+ii).classList.add('unanswered'));
+    warn.style.display='block';
+    document.getElementById('item-'+di+'-'+missing[0]).scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  warn.style.display='none';
+  if(di===DIMS.length-1){ showStyleScreen(); }
+  else goToDim(di+1);
+}
+
+function dimScore(di){
+  const vals = DIMS[di].items.map((_,ii)=>answers[di+"-"+ii]);
+  return vals.reduce((a,b)=>a+b,0)/vals.length;
+}
+function bandFor(score){ return BANDS.find(b=>score>=b.min); }
+function overallBandFor(score){ return OVERALL_BANDS.find(b=>score>=b.min); }
+function fmt(n){ return (Math.round(n*10)/10).toFixed(1); }
+
+function showResults(){
+  const scores = DIMS.map((d,di)=>({di, name:d.name, score:dimScore(di)}));
+  const overall = scores.reduce((a,s)=>a+s.score,0)/scores.length;
+  const oband = overallBandFor(overall);
+  const sorted = [...scores].sort((a,b)=>a.score-b.score);
+  const devAreas = sorted.slice(0,3).filter(s=>s.score<4.2);
+  const strengths = [...scores].sort((a,b)=>b.score-a.score).filter(s=>s.score>=3.4).slice(0,3);
+  const name = document.getElementById('f-name').value.trim();
+  const role = document.getElementById('f-role').value.trim();
+  const line = document.getElementById('f-line').value.trim();
+  const date = document.getElementById('f-date').value;
+  const refl = [
+    {q:"Strengths to build the case on", a:document.getElementById('r1').value.trim()},
+    {q:"Where I most need to develop", a:document.getElementById('r2').value.trim()},
+    {q:"Support I need", a:document.getElementById('r3').value.trim()}
+  ].filter(r=>r.a);
+
+  let html = `<div class="hero">
+      <div class="hero-kicker">Diagnostic Result</div>
+      <div class="hero-grid">
+        <div class="score serif">${fmt(overall)}<small> / 5.0</small></div>
+        <div><div class="band-label">${oband.label}</div><div class="band-desc">${oband.desc}</div></div>
+      </div>
+    </div>
+    <div class="meta-line">${[name, role, line].filter(Boolean).join(" · ")}${date? " · "+date : ""}</div>`;
+
+  html += `<div class="res-panel">
+    <div class="kicker">Readiness by Capability Area</div>
+    <div class="viz-sub">Average self-rating per area on a 1–5 scale · 1 = not yet true of me · 5 = a role model</div>
+    <div class="chart" id="chart">`;
+  scores.forEach(s=>{
+    const b = bandFor(s.score);
+    const w = (s.score/5)*100;
+    html += `<div class="row" data-name="${s.name}" data-score="${fmt(s.score)}" data-band="${b.label}"
+        onmousemove="tt(event,this)" onmouseleave="ttHide()">
+        <div class="rowlabel">${s.name}</div>
+        <div class="barwrap">
+          <div class="bar" style="width:${w}%"></div>
+          <div class="val" style="left:calc(${w}% + 7px)">${fmt(s.score)}</div>
+        </div>
+      </div>`;
+  });
+  html += `<div class="axis"><div></div><div class="ticks">
+      ${[1,2,3,4,5].map(t=>`<span class="tick" style="left:${t/5*100}%">${t}</span>`).join('')}
+      <span class="tick" style="left:0">0</span>
+    </div></div>
+  </div></div>`;
+
+  /* working style panel */
+  if(styleComplete()){
+    const st = computeStyle();
+    const P = STYLES[st.primary.k];
+    const S2 = STYLES[st.second.k];
+    html += `<div class="res-panel"><div class="kicker">Your Working Style</div>
+      <div class="style-hero"><span class="style-name">${st.label}</span></div>
+      <p style="font-size:15px;margin-bottom:4px">${P.blurb}${st.blended || st.hasSecondary ? " Alongside this, a strong <b>"+S2.name+"</b> preference: "+S2.blurb.charAt(0).toLowerCase()+S2.blurb.slice(1) : ""}</p>
+      <div class="style-counts">` +
+      ['D','I','S','C'].map(k=>`<div class="srow"><div class="slabel">${STYLES[k].name}</div><div class="strack"><div class="sfill" style="width:${(st.net[k]+20)/40*100}%"></div></div><div class="snum">${st.fmtN(st.net[k])}</div></div>`).join('') +
+      `</div>
+      <div class="style-cols">
+        <div><h5>What this style gives the role</h5><p>${P.strengths}</p></div>
+        <div><h5>What to watch</h5><p>${P.watch}</p></div>
+      </div>
+      <div class="style-coach"><b>Working on your development areas, given your style.</b> ${P.coach}</div>
+      <p class="style-caveat">A style is a preference, not a capability — there is no right style for partnership; each succeeds at it differently. Scores run from −20 to +20 around a neutral midline. Use this to understand how you will naturally go about your development, and what to compensate for.</p>
+    </div>`;
+  }
+
+  html += `<div class="res-panel"><div class="kicker">Priority Development Areas</div>
+    <h2>Where to invest first</h2>
+    <p class="dim-intro">The areas where today's self-assessment sits furthest from the partner standard — with the statements you rated lowest and practical ways to start closing the gap.</p>`;
+  if(devAreas.length===0){
+    html += `<p>No area fell below the partner standard in your self-assessment. Two suggestions: first, pressure-test this picture with your sponsor — self-ratings this strong deserve external challenge. Second, shift your focus from readiness to evidence: can you point to concrete examples for every area above?</p>`;
+  }
+  devAreas.forEach(s=>{
+    const d = DIMS[s.di];
+    const b = bandFor(s.score);
+    const low = d.items.map((it,ii)=>({it, v:answers[s.di+"-"+ii]}))
+                       .sort((a,b)=>a.v-b.v).slice(0,2).filter(x=>x.v<=3);
+    html += `<div class="dev-area">
+      <h4><span>${d.name} — ${fmt(s.score)}</span><span class="tag ${b.key}">${b.label}</span></h4>
+      <div class="band-note">${b.desc}</div>`;
+    if(low.length){
+      html += `<div class="lowitems"><em>You rated lowest</em><ul>${low.map(x=>`<li>“${x.it}” — ${x.v}/5</li>`).join('')}</ul></div>`;
+    }
+    html += `<div class="sugg-kicker">Where to start</div><ul class="sugg">${d.suggestions.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="res-panel"><div class="kicker">Strengths</div>
+    <h2>Build your case on these</h2>
+    <p class="dim-intro">Promotion cases are made on evidenced strengths as much as closed gaps. Collect concrete examples for each of these.</p>`;
+  if(strengths.length===0){
+    html += `<p>No area reached the "approaching ready" threshold yet — so treat this as your baseline. The most useful next step is a conversation with your sponsor about where to focus first.</p>`;
+  }
+  strengths.forEach(s=>{
+    const b = bandFor(s.score);
+    html += `<div class="strength-line"><span>${s.name}</span><span><span class="sc">${fmt(s.score)}</span>&ensp;<span class="tag ${b.key}">${b.label}</span></span></div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="res-panel"><div class="kicker">Full Results</div>
+    <table class="detail"><thead><tr><th>Capability area</th><th>Score</th><th>Reading</th></tr></thead><tbody>`;
+  scores.forEach(s=>{
+    const b = bandFor(s.score);
+    html += `<tr><td>${s.name}</td><td class="sc">${fmt(s.score)} / 5.0</td><td><span class="tag ${b.key}">${b.label}</span></td></tr>`;
+  });
+  html += `<tr><td><b>Overall</b></td><td class="sc"><b>${fmt(overall)} / 5.0</b></td><td>${oband.label}</td></tr>`;
+  html += `</tbody></table></div>`;
+
+  if(refl.length){
+    html += `<div class="res-panel"><div class="kicker">Your Reflections</div>`;
+    refl.forEach(r=>{ html += `<div class="refl-echo"><div class="q">${r.q}</div><div class="a">${escapeHtml(r.a)}</div></div>`; });
+    html += `</div>`;
+  }
+
+  html += `<div class="res-panel steps"><div class="kicker">What To Do With This</div>
+    <p><b>Send it.</b> Share your results with Emperico below — they inform your development conversations and how we support you from here.</p>
+    <p><b>Share it.</b> Print or save this report and take it to your sponsor, mentor or coach. Ask them where they would have rated you differently — the disagreements are the most valuable data you will get.</p>
+    <p><b>Turn the priorities into a plan.</b> For each development area above, agree one visible commitment for the next 90 days.</p>
+    <p><b>Re-assess.</b> Retake this diagnostic in six months and compare the movement. Readiness is a trajectory, not a score.</p>
+    <div class="actions noprint">
+      <button class="btn primary" onclick="sendResults()">Send my results to Emperico</button>
+      <button class="btn ghost" onclick="window.print()">Print / save as PDF</button>
+      <button class="btn ghost" onclick="copySummary()">Copy summary for your sponsor</button>
+      <button class="btn ghost" onclick="restart()">Start again</button>
+      <span class="copied" id="copiedMsg">Copied to clipboard</span>
+    </div></div>`;
+
+  const scr = document.getElementById('screen-results');
+  scr.innerHTML = html;
+  show('screen-results');
+  document.getElementById('progress').style.display='none';
+
+  requestAnimationFrame(()=>{
+    const rows = document.querySelectorAll('#chart .row');
+    if(!rows.length) return;
+    const chart = document.getElementById('chart');
+    const first = rows[0], last = rows[rows.length-1];
+    const barwrap = first.querySelector('.barwrap');
+    const cRect = chart.getBoundingClientRect();
+    const left = barwrap.getBoundingClientRect().left - cRect.left;
+    const top = first.getBoundingClientRect().top - cRect.top;
+    const bottom = last.getBoundingClientRect().bottom - cRect.top;
+    const width = barwrap.getBoundingClientRect().width;
+    for(let t=1;t<=5;t++){
+      const line = document.createElement('div');
+      line.style.cssText = `position:absolute;width:1px;background:var(--grid);left:${left + width*t/5}px;top:${top}px;height:${bottom-top}px;z-index:0`;
+      chart.appendChild(line);
+    }
+  });
+
+  const whereToStart = devAreas.map(s=>{
+    const d = DIMS[s.di], b = bandFor(s.score);
+    const low = d.items.map((it,ii)=>({it, v:answers[s.di+"-"+ii]})).sort((a,b)=>a.v-b.v).slice(0,2);
+    return { area:d.name, score:fmt(s.score), band:b.label, bandDesc:b.desc, bandKey:b.key, lowest:low, suggestions:d.suggestions||[] };
+  });
+  const strengthsOut = strengths.map(s=>{
+    const d = DIMS[s.di], b = bandFor(s.score);
+    return { area:d.name, score:fmt(s.score), band:b.label, bandKey:b.key };
+  });
+  window._results = {scores, overall, name, role, line, date, refl, style: computeStyle(), whereToStart, strengthsList: strengthsOut};
+  postResults();
+}
+
+function tt(ev,row){
+  const t = document.getElementById('tooltip');
+  t.innerHTML = `<b>${row.dataset.name}</b><br>${row.dataset.score} / 5.0 — ${row.dataset.band}`;
+  t.style.display='block';
+  const x = Math.min(ev.pageX+14, document.documentElement.scrollWidth-260);
+  t.style.left = x+'px';
+  t.style.top = (ev.pageY+14)+'px';
+}
+function ttHide(){ document.getElementById('tooltip').style.display='none'; }
+
+function buildSummaryText(includeItems){
+  const r = window._results;
+  let txt = `EMPERICO PARTNER READINESS DIAGNOSTIC — SELF-ASSESSMENT SUMMARY\n`;
+  txt += [r.name, r.role, r.line].filter(Boolean).join(" · ") + (r.date? " · "+r.date:"") + "\n\n";
+  txt += `Overall: ${fmt(r.overall)} / 5.0 — ${overallBandFor(r.overall).label}\n\nBy capability area:\n`;
+  r.scores.forEach(s=>{ txt += `  ${s.name}: ${fmt(s.score)} / 5.0 — ${bandFor(s.score).label}\n`; });
+  const dev = [...r.scores].sort((a,b)=>a.score-b.score).slice(0,3).filter(s=>s.score<4.2);
+  if(dev.length){ txt += `\nPriority development areas: ${dev.map(s=>s.name).join("; ")}\n`; }
+  if(includeItems){
+    txt += `\nItem-level ratings:\n`;
+    DIMS.forEach((d,di)=>d.items.forEach((it,ii)=>{ txt += `  ${di+1}.${ii+1} [${answers[di+"-"+ii]}] ${it}\n`; }));
+  }
+  if(styleComplete()){
+    txt += `\nWorking style: ${computeStyle().summaryLine}\n`;
+  }
+  r.refl.forEach(x=>{ txt += `\n${x.q}:\n${x.a}\n`; });
+  txt += `\nGenerated by the Emperico Partner Readiness Diagnostic (self-assessment).`;
+  return txt;
+}
+
+function copySummary(){
+  navigator.clipboard.writeText(buildSummaryText(false)).then(()=>{
+    const m = document.getElementById('copiedMsg');
+    m.style.display='inline'; setTimeout(()=>m.style.display='none', 2500);
+  });
+}
+
+function sendResults(){
+  const r = window._results;
+  const subject = "Partner Readiness Diagnostic — " + (r.name || "completed self-assessment");
+  const body = buildSummaryText(false);
+  window.location.href = "mailto:" + RESULTS_EMAIL +
+    "?subject=" + encodeURIComponent(subject) +
+    "&body=" + encodeURIComponent(body);
+}
+
+function postResults(){
+  if(!RESULTS_ENDPOINT) return;
+  try{
+    const r = window._results;
+    fetch(RESULTS_ENDPOINT, {
+      method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        token: LINK_TOKEN,
+        name:r.name, role:r.role, line:r.line, date:r.date,
+        overall:fmt(r.overall),
+        scores:r.scores.map(s=>({area:s.name, score:fmt(s.score), band:bandFor(s.score).label, bandKey:bandFor(s.score).key})),
+        style: r.style ? { label:r.style.label, net:r.style.net, summaryLine:r.style.summaryLine } : null,
+        whereToStart: r.whereToStart || [],
+        strengths: r.strengthsList || [],
+        answers, reflections:r.refl,
+        summary: buildSummaryText(true)
+      })
+    });
+  }catch(e){}
+}
+
+function restart(){
+  answers = {}; styleAnswers = {}; currentDim = -1;
+  document.querySelectorAll('.opts button, .mlbtn').forEach(b=>b.classList.remove('sel'));
+  ['r1','r2','r3'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('progressFill').style.width='0%';
+  goIntro();
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+buildScreens();
+buildStyleScreen();
+if(typeof window !== "undefined" && window.EMPERICO_NAME){ var _n = document.getElementById("f-name"); if(_n) _n.value = window.EMPERICO_NAME; }
+</script>
+</body>
+</html>

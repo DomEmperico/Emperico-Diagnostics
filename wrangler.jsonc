@@ -4,7 +4,8 @@
   "main": "worker.js",
   "assets": {
     "directory": "./",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    "html_handling": "none"
   },
   "kv_namespaces": [
     {
@@ -13,3 +14,4 @@
     }
   ]
 }
+

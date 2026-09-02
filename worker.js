@@ -143,12 +143,12 @@ async function handleAdminLinks(env) {
 // ---------- respondent-facing ----------
 
 async function handleRespondentLink(token, env, request) {
-  if (!token) return notFoundPage();
+  if (!token) return notFoundPage("no-token");
   const raw = await env.LINKS.get("link:" + token);
-  if (!raw) return notFoundPage();
+  if (!raw) return notFoundPage("no-record");
 
   let record;
-  try { record = JSON.parse(raw); } catch (e) { return notFoundPage(); }
+  try { record = JSON.parse(raw); } catch (e) { return notFoundPage("bad-record-json"); }
 
   if (record.status === "completed") {
     return usedPage(record);
@@ -156,11 +156,11 @@ async function handleRespondentLink(token, env, request) {
 
   const key = record.tool + ":" + record.edition;
   const filePath = TOOL_FILES[key];
-  if (!filePath) return notFoundPage();
+  if (!filePath) return notFoundPage("unknown-tool-key:" + key);
 
   const assetUrl = new URL(filePath, request.url);
   const assetResp = await env.ASSETS.fetch(new Request(assetUrl, request));
-  if (!assetResp.ok) return notFoundPage();
+  if (!assetResp.ok) return notFoundPage("asset-fetch-failed:" + filePath + ":status-" + assetResp.status);
 
   let html = await assetResp.text();
   const inject =
@@ -204,8 +204,8 @@ function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
 }
 
-function notFoundPage() {
-  return new Response(privatePageHtml("This link isn't valid", "Double check the link, or get in touch with whoever sent it to you."), {
+function notFoundPage(reason) {
+  return new Response(privatePageHtml("This link isn't valid", "Double check the link, or get in touch with whoever sent it to you." + (reason ? `<br><br><span style="font-size:11px;color:#a99;">debug: ${reason}</span>` : "")), {
     status: 404,
     headers: { "Content-Type": "text/html; charset=UTF-8" }
   });

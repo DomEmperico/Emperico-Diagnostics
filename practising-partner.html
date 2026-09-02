@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Practising Partner — Development Self-Assessment</title>
+<title>The Practising Partner - Development Self-Assessment</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  :root{
-    --bg:#0f231c;
-    --panel:#163429;
-    --border:#2b4a3c;
-    --text:#f2ede0;
-    --text-soft:#d7dcd2;
-    --text-muted:#93a08f;
-    --accent:#c9a35f;
-    --accent-strong:#c9a35f;
-    --accent-soft:#22392c;
-    --btn-text:#0f231c;
-  }
+ :root{
+ --bg:#0f231c;
+ --panel:#163429;
+ --border:#2b4a3c;
+ --text:#f2ede0;
+ --text-soft:#d7dcd2;
+ --text-muted:#93a08f;
+ --accent:#c9a35f;
+ --accent-strong:#c9a35f;
+ --accent-soft:#22392c;
+ --btn-text:#0f231c;
+ }
 </style>
 </head>
 <body>
@@ -26,193 +26,193 @@
 <script src="engine.js"></script>
 <script>
 const DATA = {
-  toolId: "practising-partner",
-  title: "The Practising Partner",
-  subtitle: "A development self-assessment for partners already in role — where next, as a partner?",
-  epigraph: "Distilled from thousands of hours spent working alongside partners — and the firms they lead.",
-  logoSvg: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="color:var(--accent-strong)"><path d="M4 30 Q24 10 44 30" stroke="currentColor" stroke-width="2.5"/><line x1="10" y1="16" x2="10" y2="34" stroke="currentColor" stroke-width="2.5"/><line x1="38" y1="16" x2="38" y2="34" stroke="currentColor" stroke-width="2.5"/><line x1="4" y1="34" x2="44" y2="34" stroke="currentColor" stroke-width="2.5"/></svg>',
-  defaultEdition: "A",
-  emailTo: "mark@empericogroup.com",
-  resultsEndpoint: "",
-  editions: {
-    A: {
-      label: "Traditional partnership",
-      pillLabel: "Edition A",
-      footerMark: "Edition A",
-      intro: "Partners think and act like owners. This assessment is built around what that continues to demand once you're already in the role — not a test of your title, but of where to focus next."
-    },
-    B: {
-      label: "PE / corporate-backed",
-      pillLabel: "Edition B",
-      footerMark: "Edition B",
-      intro: "Partners take charge of the business. This assessment is built around what that continues to demand once you're already in the role — not a test of your title, but of where to focus next."
-    }
-  },
-  copy: {
-    introBody: [
-      "You'll work through eight capability areas as a series of first-person statements, rate a working-style module, and finish with a short set of reflections. The title was never the destination — this is where next."
-    ],
-    timeEstimate: "20–25 minutes",
-    startButton: "Begin the assessment",
-    resumeButton: "Resume where you left off",
-    discIntro: "For each pair of situations below, mark the statement that's most like you and the one that's least like you. There are no right answers — this measures preference, not capability.",
-    reportIntro: "Here's where things stand today — and where to focus next.",
-    agendaTitle: "Your coaching agenda",
-    agendaIntro: "The three areas with the most room to grow right now, with where to start.",
-    strengthsTitle: "Signature strengths — lead with these",
-    sendButton: "Send my results to Emperico",
-    copySummaryLabel: "Copy summary for your coach",
-    reflections: [
-      { id:"best", label:"When are you at your best as a partner?" },
-      { id:"focus", label:"What's your development and coaching focus over the next 12 months?" },
-      { id:"changed", label:"What's changed around you that your development needs to catch up with?" }
-    ]
-  },
-  areaBands: [
-    { min:4.2, label:"Signature strength" },
-    { min:3.4, label:"Solid" },
-    { min:2.6, label:"Development focus" },
-    { min:0,   label:"Coaching priority" }
-  ],
-  overallBands: [
-    { min:4.2, label:"Operating at the top of the role" },
-    { min:3.4, label:"A strong core with a clear agenda" },
-    { min:2.6, label:"A meaningful development agenda" },
-    { min:0,   label:"Time to reinvest in the role" }
-  ],
-  areas: [
-    {
-      id:"lead", name:"Lead the Business",
-      desc:"Firm-wide thinking, partner-level work, commercial discipline and delivering on your goals.",
-      items: [
-        { id:1, text:"I think and act like an owner of the firm, not just a senior member of staff.",
-          editionText:{ B:"I think and act like someone who takes full responsibility for the firm's growth and future, not just a senior member of staff." } },
-        { id:2, text:"I think about what's right for the whole firm, not just my own team or clients." },
-        { id:3, text:"I take on work and decisions at a genuinely partner level, not just senior-manager level." },
-        { id:4, text:"I manage scope, WIP and billing on my work with real commercial discipline." },
-        { id:5, text:"I actively manage recovery and write-offs rather than letting them drift." },
-        { id:6, text:"I plan my capacity ahead of time and deliver against the goals I set." }
-      ]
-    },
-    {
-      id:"grow", name:"Grow Clients & Revenue",
-      desc:"Deepening relationships, originating work and treating clients as the firm's clients.",
-      items: [
-        { id:1, text:"I deepen my client relationships in ways that grow fees over time." },
-        { id:2, text:"I originate new work rather than relying on work that simply comes to me." },
-        { id:3, text:"I build and use referral sources beyond my existing network." },
-        { id:4, text:"I sell the whole firm's services, not just my own, into my client relationships." },
-        { id:5, text:"I keep a visible, current pipeline and treat my clients as the firm's clients, not my own." }
-      ]
-    },
-    {
-      id:"people", name:"Develop People",
-      desc:"Mentoring, delegating well, and being generous with knowledge and opportunity.",
-      items: [
-        { id:1, text:"I actively mentor people I think could be future leaders of this firm." },
-        { id:2, text:"I delegate well — giving people real ownership, not just tasks." },
-        { id:3, text:"I share knowledge and opportunities generously rather than holding onto them." },
-        { id:4, text:"I give direct, honest feedback even when it's uncomfortable." },
-        { id:5, text:"I treat every member of staff with genuine respect, regardless of their level." }
-      ]
-    },
-    {
-      id:"integrity", name:"Integrity & Accountability",
-      desc:"Values under pressure, quality of work, reliability and the willingness to make the hard call.",
-      items: [
-        { id:1, text:"I hold to my values even when it's commercially inconvenient." },
-        { id:2, text:"I make the ethical call even under pressure to compromise." },
-        { id:3, text:"The quality of my own work is something I'd stand behind without qualification." },
-        { id:4, text:"I'm reliable — I close loops and follow through on what I say I'll do." },
-        { id:5, text:"I'm willing to make the hard call, even when it's unpopular." }
-      ]
-    },
-    {
-      id:"culture", name:"Cultural Leadership",
-      desc:"Setting tone, communicating openly and resolving conflict early.",
-      items: [
-        { id:1, text:"I'm conscious that my tone and behaviour set the tone for others." },
-        { id:2, text:"I communicate openly, including when the news isn't good." },
-        { id:3, text:"I welcome constructive challenge to my own thinking." },
-        { id:4, text:"I resolve conflict early, before it festers." },
-        { id:5, text:"I model the culture I want to see, through my behaviour, not just my words." }
-      ]
-    },
-    {
-      id:"change", name:"Champion Change",
-      desc:"Leading rather than waiting, and helping others through transition.",
-      items: [
-        { id:1, text:"I lead change rather than waiting to see how it plays out." },
-        { id:2, text:"I actively help others through the transitions that change brings." },
-        { id:3, text:"I back the firm's strategy and decisions, even ones I didn't originally choose." },
-        { id:4, text:"I bring energy to change initiatives rather than just tolerating them." }
-      ]
-    },
-    {
-      id:"stewardship", name:"Stewardship & Risk",
-      desc:"Protecting the firm's reputation, managing risk and owning the quality of your work.",
-      items: [
-        { id:1, text:"I actively protect the firm's reputation in everything I do." },
-        { id:2, text:"I'm disciplined about avoiding work or clients that carry disproportionate risk." },
-        { id:3, text:"I escalate concerns early, rather than hoping they resolve themselves." },
-        { id:4, text:"I keep my technical knowledge current." },
-        { id:5, text:"I take personal ownership of the quality of everything with my name on it." }
-      ]
-    },
-    {
-      id:"succession", name:"Own Succession",
-      desc:"The strongest partners are already building their own replacement — full succession, not just cover for your current role.",
-      items: [
-        { id:1, text:"I'm actively developing someone who could take over from me, partner-level responsibilities included." },
-        { id:2, text:"There's enough redundancy around me that I'm not a single point of failure." },
-        { id:3, text:"I share my client relationships rather than keeping them close to me alone." },
-        { id:4, text:"I choose generosity over rivalry when it comes to others' progress." },
-        { id:5, text:"If I stepped back tomorrow, my clients and team could carry on without missing a beat." }
-      ]
-    }
-  ],
-  actionsByArea: {
-    lead: [
-      "Revisit your commercial discipline on your top three engagements this week — scope, WIP, recovery.",
-      "Write down the three firm-wide priorities you'd protect even under pressure on your own numbers.",
-      "Ask a fellow partner where they see your firm-wide thinking slipping toward team-level thinking."
-    ],
-    grow: [
-      "List every referral source you've used in the last 12 months — then name one you haven't.",
-      "Introduce one client to a colleague from a different service line this quarter.",
-      "Put your pipeline somewhere visible and keep it current, not just in your head."
-    ],
-    people: [
-      "Name the one person you'd most regret not having mentored further — start this month.",
-      "Delegate one thing you'd normally keep, with the outcome owned by someone else.",
-      "Give one piece of direct feedback you've been putting off."
-    ],
-    integrity: [
-      "Think of the last time you softened an honest answer — decide what you'd do differently.",
-      "Write down one call you made under pressure you're still not sure was right.",
-      "Close out one open loop you've been carrying longer than you should."
-    ],
-    culture: [
-      "Ask a colleague what your tone communicates when you're under pressure.",
-      "Raise one piece of difficult news proactively rather than waiting to be asked.",
-      "Address one piece of low-level friction before it becomes a bigger problem."
-    ],
-    change: [
-      "Pick one change you've been neutral about and actively back it, visibly.",
-      "Check in with someone you know is struggling with a recent change.",
-      "Volunteer to help lead, not just implement, the next initiative that lands on your desk."
-    ],
-    stewardship: [
-      "Review one live matter for risk signals you might otherwise wait to see.",
-      "Flag one concern early this week rather than waiting for it to resolve itself.",
-      "Block time this month for technical update reading or training."
-    ],
-    succession: [
-      "Name the person most likely to step into your role — and what's stopping them right now.",
-      "Hand over one relationship or responsibility you've been holding onto.",
-      "Write down what would actually happen to your clients and team if you stepped back tomorrow."
-    ]
-  }
+ toolId: "practising-partner",
+ title: "The Practising Partner",
+ subtitle: "A development self-assessment for partners already in role - where next, as a partner?",
+ epigraph: "Distilled from thousands of hours spent working alongside partners - and the firms they lead.",
+ logoSvg: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="color:var(--accent-strong)"><path d="M4 30 Q24 10 44 30" stroke="currentColor" stroke-width="2.5"/><line x1="10" y1="16" x2="10" y2="34" stroke="currentColor" stroke-width="2.5"/><line x1="38" y1="16" x2="38" y2="34" stroke="currentColor" stroke-width="2.5"/><line x1="4" y1="34" x2="44" y2="34" stroke="currentColor" stroke-width="2.5"/></svg>',
+ defaultEdition: "A",
+ emailTo: "mark@empericogroup.com",
+ resultsEndpoint: "/api/send-results",
+ editions: {
+ A: {
+ label: "Traditional partnership",
+ pillLabel: "Edition A",
+ footerMark: "Edition A",
+ intro: "Partners think and act like owners. This assessment is built around what that continues to demand once you're already in the role - not a test of your title, but of where to focus next."
+ },
+ B: {
+ label: "PE / corporate-backed",
+ pillLabel: "Edition B",
+ footerMark: "Edition B",
+ intro: "Partners take charge of the business. This assessment is built around what that continues to demand once you're already in the role - not a test of your title, but of where to focus next."
+ }
+ },
+ copy: {
+ introBody: [
+ "You'll work through eight capability areas as a series of first-person statements, rate a working-style module, and finish with a short set of reflections. The title was never the destination - this is where next."
+ ],
+ timeEstimate: "20-25 minutes",
+ startButton: "Begin the assessment",
+ resumeButton: "Resume where you left off",
+ discIntro: "For each pair of situations below, mark the statement that's most like you and the one that's least like you. There are no right answers - this measures preference, not capability.",
+ reportIntro: "Here's where things stand today - and where to focus next.",
+ agendaTitle: "Your coaching agenda",
+ agendaIntro: "The three areas with the most room to grow right now, with where to start.",
+ strengthsTitle: "Signature strengths - lead with these",
+ sendButton: "Send my results to Emperico",
+ copySummaryLabel: "Copy summary for your coach",
+ reflections: [
+ { id:"best", label:"When are you at your best as a partner?" },
+ { id:"focus", label:"What's your development and coaching focus over the next 12 months?" },
+ { id:"changed", label:"What's changed around you that your development needs to catch up with?" }
+ ]
+ },
+ areaBands: [
+ { min:4.2, label:"Signature strength" },
+ { min:3.4, label:"Solid" },
+ { min:2.6, label:"Development focus" },
+ { min:0, label:"Coaching priority" }
+ ],
+ overallBands: [
+ { min:4.2, label:"Operating at the top of the role" },
+ { min:3.4, label:"A strong core with a clear agenda" },
+ { min:2.6, label:"A meaningful development agenda" },
+ { min:0, label:"Time to reinvest in the role" }
+ ],
+ areas: [
+ {
+ id:"lead", name:"Lead the Business",
+ desc:"Firm-wide thinking, partner-level work, commercial discipline and delivering on your goals.",
+ items: [
+ { id:1, text:"I think and act like an owner of the firm, not just a senior member of staff.",
+ editionText:{ B:"I think and act like someone who takes full responsibility for the firm's growth and future, not just a senior member of staff." } },
+ { id:2, text:"I think about what's right for the whole firm, not just my own team or clients." },
+ { id:3, text:"I take on work and decisions at a genuinely partner level, not just senior-manager level." },
+ { id:4, text:"I manage scope, WIP and billing on my work with real commercial discipline." },
+ { id:5, text:"I actively manage recovery and write-offs rather than letting them drift." },
+ { id:6, text:"I plan my capacity ahead of time and deliver against the goals I set." }
+ ]
+ },
+ {
+ id:"grow", name:"Grow Clients & Revenue",
+ desc:"Deepening relationships, originating work and treating clients as the firm's clients.",
+ items: [
+ { id:1, text:"I deepen my client relationships in ways that grow fees over time." },
+ { id:2, text:"I originate new work rather than relying on work that simply comes to me." },
+ { id:3, text:"I build and use referral sources beyond my existing network." },
+ { id:4, text:"I sell the whole firm's services, not just my own, into my client relationships." },
+ { id:5, text:"I keep a visible, current pipeline and treat my clients as the firm's clients, not my own." }
+ ]
+ },
+ {
+ id:"people", name:"Develop People",
+ desc:"Mentoring, delegating well, and being generous with knowledge and opportunity.",
+ items: [
+ { id:1, text:"I actively mentor people I think could be future leaders of this firm." },
+ { id:2, text:"I delegate well - giving people real ownership, not just tasks." },
+ { id:3, text:"I share knowledge and opportunities generously rather than holding onto them." },
+ { id:4, text:"I give direct, honest feedback even when it's uncomfortable." },
+ { id:5, text:"I treat every member of staff with genuine respect, regardless of their level." }
+ ]
+ },
+ {
+ id:"integrity", name:"Integrity & Accountability",
+ desc:"Values under pressure, quality of work, reliability and the willingness to make the hard call.",
+ items: [
+ { id:1, text:"I hold to my values even when it's commercially inconvenient." },
+ { id:2, text:"I make the ethical call even under pressure to compromise." },
+ { id:3, text:"The quality of my own work is something I'd stand behind without qualification." },
+ { id:4, text:"I'm reliable - I close loops and follow through on what I say I'll do." },
+ { id:5, text:"I'm willing to make the hard call, even when it's unpopular." }
+ ]
+ },
+ {
+ id:"culture", name:"Cultural Leadership",
+ desc:"Setting tone, communicating openly and resolving conflict early.",
+ items: [
+ { id:1, text:"I'm conscious that my tone and behaviour set the tone for others." },
+ { id:2, text:"I communicate openly, including when the news isn't good." },
+ { id:3, text:"I welcome constructive challenge to my own thinking." },
+ { id:4, text:"I resolve conflict early, before it festers." },
+ { id:5, text:"I model the culture I want to see, through my behaviour, not just my words." }
+ ]
+ },
+ {
+ id:"change", name:"Champion Change",
+ desc:"Leading rather than waiting, and helping others through transition.",
+ items: [
+ { id:1, text:"I lead change rather than waiting to see how it plays out." },
+ { id:2, text:"I actively help others through the transitions that change brings." },
+ { id:3, text:"I back the firm's strategy and decisions, even ones I didn't originally choose." },
+ { id:4, text:"I bring energy to change initiatives rather than just tolerating them." }
+ ]
+ },
+ {
+ id:"stewardship", name:"Stewardship & Risk",
+ desc:"Protecting the firm's reputation, managing risk and owning the quality of your work.",
+ items: [
+ { id:1, text:"I actively protect the firm's reputation in everything I do." },
+ { id:2, text:"I'm disciplined about avoiding work or clients that carry disproportionate risk." },
+ { id:3, text:"I escalate concerns early, rather than hoping they resolve themselves." },
+ { id:4, text:"I keep my technical knowledge current." },
+ { id:5, text:"I take personal ownership of the quality of everything with my name on it." }
+ ]
+ },
+ {
+ id:"succession", name:"Own Succession",
+ desc:"The strongest partners are already building their own replacement - full succession, not just cover for your current role.",
+ items: [
+ { id:1, text:"I'm actively developing someone who could take over from me, partner-level responsibilities included." },
+ { id:2, text:"There's enough redundancy around me that I'm not a single point of failure." },
+ { id:3, text:"I share my client relationships rather than keeping them close to me alone." },
+ { id:4, text:"I choose generosity over rivalry when it comes to others' progress." },
+ { id:5, text:"If I stepped back tomorrow, my clients and team could carry on without missing a beat." }
+ ]
+ }
+ ],
+ actionsByArea: {
+ lead: [
+ "Revisit your commercial discipline on your top three engagements this week - scope, WIP, recovery.",
+ "Write down the three firm-wide priorities you'd protect even under pressure on your own numbers.",
+ "Ask a fellow partner where they see your firm-wide thinking slipping toward team-level thinking."
+ ],
+ grow: [
+ "List every referral source you've used in the last 12 months - then name one you haven't.",
+ "Introduce one client to a colleague from a different service line this quarter.",
+ "Put your pipeline somewhere visible and keep it current, not just in your head."
+ ],
+ people: [
+ "Name the one person you'd most regret not having mentored further - start this month.",
+ "Delegate one thing you'd normally keep, with the outcome owned by someone else.",
+ "Give one piece of direct feedback you've been putting off."
+ ],
+ integrity: [
+ "Think of the last time you softened an honest answer - decide what you'd do differently.",
+ "Write down one call you made under pressure you're still not sure was right.",
+ "Close out one open loop you've been carrying longer than you should."
+ ],
+ culture: [
+ "Ask a colleague what your tone communicates when you're under pressure.",
+ "Raise one piece of difficult news proactively rather than waiting to be asked.",
+ "Address one piece of low-level friction before it becomes a bigger problem."
+ ],
+ change: [
+ "Pick one change you've been neutral about and actively back it, visibly.",
+ "Check in with someone you know is struggling with a recent change.",
+ "Volunteer to help lead, not just implement, the next initiative that lands on your desk."
+ ],
+ stewardship: [
+ "Review one live matter for risk signals you might otherwise wait to see.",
+ "Flag one concern early this week rather than waiting for it to resolve itself.",
+ "Block time this month for technical update reading or training."
+ ],
+ succession: [
+ "Name the person most likely to step into your role - and what's stopping them right now.",
+ "Hand over one relationship or responsibility you've been holding onto.",
+ "Write down what would actually happen to your clients and team if you stepped back tomorrow."
+ ]
+ }
 };
 initTool(DATA);
 </script>

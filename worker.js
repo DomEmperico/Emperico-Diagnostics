@@ -11,6 +11,12 @@ export default {
           return json({ ok: false, error: "A valid email is required." }, 400);
         }
 
+        // NOTE: using Resend's shared test domain (onboarding@resend.dev) for now,
+        // because empericogroup.com is not yet verified in Resend. In sandbox mode
+        // Resend will only actually deliver to the email address the Resend account
+        // itself was signed up with - other recipients will get a rejected response.
+        // Once empericogroup.com is verified (see Resend > Domains), change "from"
+        // below to something like: "Emperico Diagnostics <results@empericogroup.com>"
         const resendResp = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -18,7 +24,7 @@ export default {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            from: "Emperico Diagnostics <results@empericogroup.com>",
+            from: "Emperico Diagnostics <onboarding@resend.dev>",
             to: [email],
             bcc: ["dom@empericogroup.com", "mark@empericogroup.com"],
             subject: subject || (tool ? `Your ${tool} results` : "Your diagnostic results"),

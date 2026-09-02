@@ -5,99 +5,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Emperico Partner Diagnostics</title>
 <style>
-  :root{
-    --bg:#f3efe6;
-    --panel:#fbf9f4;
-    --border:#ddd2ba;
-    --text:#152238;
-    --text-soft:#33415f;
-    --text-muted:#847b64;
-    --accent:#0d1c39;
-    --accent-strong:#a08243;
-  }
-  *{ box-sizing:border-box; }
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:"Public Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    line-height:1.5;
-    -webkit-font-smoothing:antialiased;
-  }
-  .wrap{ max-width:880px; margin:0 auto; padding:0 28px; }
-  header{ padding:70px 0 20px; }
-  h1{
-    font-family:"Source Serif 4","Iowan Old Style",Georgia,serif;
-    font-weight:600;
-    font-size:42px;
-    line-height:1.12;
-    letter-spacing:-0.01em;
-    margin:0 0 18px;
-    max-width:16ch;
-  }
-  .lede{ font-size:18px; color:var(--text-soft); max-width:56ch; margin:0 0 6px; }
-  .epigraph{ font-style:italic; color:var(--text-muted); font-size:14.5px; margin:22px 0 0; max-width:52ch; }
-  .rule{ height:1px; background:var(--border); border:0; margin:46px 0 40px; }
-  .cards{ display:grid; gap:18px; margin-bottom:60px; }
-  .card{
-    display:block;
-    text-decoration:none;
-    color:var(--text);
-    border:1px solid var(--border);
-    border-radius:3px;
-    background:var(--panel);
-    padding:28px 30px;
-    position:relative;
-    padding-left:38px;
-    transition:border-color .15s ease;
-  }
-  .card:hover{ border-color:var(--accent-strong); }
-  .card::before{
-    content:"";
-    position:absolute;
-    left:0; top:0; bottom:0;
-    width:6px;
-    border-radius:3px 0 0 3px;
-  }
-  .card.a::before{ background:#0d1c39; }
-  .card.b::before{ background:#163429; }
-  .card.c::before{ background:#2b151b; }
-  .card .kicker{ font-size:13px; color:var(--text-muted); margin-bottom:6px; }
-  .card h2{ font-family:"Source Serif 4",Georgia,serif; font-size:22px; margin:0 0 8px; font-weight:600; }
-  .card p{ margin:0; color:var(--text-soft); font-size:15px; max-width:56ch; }
-  .card .go{ display:inline-block; margin-top:14px; font-size:13.5px; color:var(--accent-strong); }
-  footer{ padding:0 0 70px; color:var(--text-muted); font-size:13px; }
+ :root{
+ --bg:#f3efe6;
+ --panel:#fbf9f4;
+ --border:#ddd2ba;
+ --text:#152238;
+ --text-soft:#33415f;
+ --text-muted:#847b64;
+ --accent:#0d1c39;
+ --accent-strong:#a08243;
+ }
+ *{ box-sizing:border-box; }
+ body{
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ font-family:"Public Sans","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ line-height:1.5;
+ -webkit-font-smoothing:antialiased;
+ }
+ .wrap{ max-width:880px; margin:0 auto; padding:0 28px; }
+ header{ padding:70px 0 20px; }
+ h1{
+ font-family:"Source Serif 4","Iowan Old Style",Georgia,serif;
+ font-weight:600;
+ font-size:42px;
+ line-height:1.12;
+ letter-spacing:-0.01em;
+ margin:0 0 18px;
+ max-width:16ch;
+ }
+ .lede{ font-size:18px; color:var(--text-soft); max-width:56ch; margin:0 0 6px; }
+ .epigraph{ font-style:italic; color:var(--text-muted); font-size:14.5px; margin:22px 0 0; max-width:52ch; }
+ .rule{ height:1px; background:var(--border); border:0; margin:46px 0 40px; }
+ .cards{ display:grid; gap:18px; margin-bottom:60px; }
+ .card{
+ display:block;
+ text-decoration:none;
+ color:var(--text);
+ border:1px solid var(--border);
+ border-radius:3px;
+ background:var(--panel);
+ padding:28px 30px;
+ position:relative;
+ padding-left:38px;
+ transition:border-color .15s ease;
+ }
+ .card:hover{ border-color:var(--accent-strong); }
+ .card::before{
+ content:"";
+ position:absolute;
+ left:0; top:0; bottom:0;
+ width:6px;
+ border-radius:3px 0 0 3px;
+ }
+ .card.a::before{ background:#0d1c39; }
+ .card.b::before{ background:#163429; }
+ .card.c::before{ background:#2b151b; }
+ .card .kicker{ font-size:13px; color:var(--text-muted); margin-bottom:6px; }
+ .card h2{ font-family:"Source Serif 4",Georgia,serif; font-size:22px; margin:0 0 8px; font-weight:600; }
+ .card p{ margin:0; color:var(--text-soft); font-size:15px; max-width:56ch; }
+ .card .go{ display:inline-block; margin-top:14px; font-size:13.5px; color:var(--accent-strong); }
+ footer{ padding:0 0 70px; color:var(--text-muted); font-size:13px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>Emperico Partner Diagnostics</h1>
-    <p class="lede">Three self-assessments for the partner journey — becoming one, growing in the role, and leading the firm itself.</p>
-    <p class="epigraph">Distilled from thousands of hours spent working alongside partners, and the firms they lead.</p>
-  </header>
-  <hr class="rule">
-  <div class="cards">
-    <a class="card a" href="partner-track.html">
-      <div class="kicker">For people on the way to becoming a partner</div>
-      <h2>The Partner Track</h2>
-      <p>A readiness self-assessment across eight capability areas — where you stand today, and what to work on before stepping up.</p>
-      <span class="go">Begin the assessment →</span>
-    </a>
-    <a class="card b" href="practising-partner.html">
-      <div class="kicker">For partners already in role</div>
-      <h2>The Practising Partner</h2>
-      <p>A development self-assessment for established partners — where next, as a partner, once the title was never the destination.</p>
-      <span class="go">Begin the assessment →</span>
-    </a>
-    <a class="card c" href="firm-leader.html">
-      <div class="kicker">For the soon-to-be sector lead, office head or managing partner</div>
-      <h2>The Firm Leader</h2>
-      <p>A transition diagnostic built around the shift from doing to leading — the skills that made you a great partner aren't the ones this role demands.</p>
-      <span class="go">Begin the assessment →</span>
-    </a>
-  </div>
-  <footer>Each tool takes 20–25 minutes, includes a working-style module, and ends with a report you can send, print or copy for a sponsor or coach.</footer>
+ <header>
+ <h1>Emperico Partner Diagnostics</h1>
+ <p class="lede">Three self-assessments for the partner journey - becoming one, growing in the role, and leading the firm itself.</p>
+ <p class="epigraph">Distilled from thousands of hours spent working alongside partners, and the firms they lead.</p>
+ </header>
+ <hr class="rule">
+ <div class="cards">
+ <a class="card a" href="partner-track.html">
+ <div class="kicker">For people on the way to becoming a partner</div>
+ <h2>The Partner Track</h2>
+ <p>A readiness self-assessment across eight capability areas - where you stand today, and what to work on before stepping up.</p>
+ <span class="go">Begin the assessment -></span>
+ </a>
+ <a class="card b" href="practising-partner.html">
+ <div class="kicker">For partners already in role</div>
+ <h2>The Practising Partner</h2>
+ <p>A development self-assessment for established partners - where next, as a partner, once the title was never the destination.</p>
+ <span class="go">Begin the assessment -></span>
+ </a>
+ <a class="card c" href="firm-leader.html">
+ <div class="kicker">For the soon-to-be sector lead, office head or managing partner</div>
+ <h2>The Firm Leader</h2>
+ <p>A transition diagnostic built around the shift from doing to leading - the skills that made you a great partner aren't the ones this role demands.</p>
+ <span class="go">Begin the assessment -></span>
+ </a>
+ </div>
+ <footer>Each tool takes 20-25 minutes, includes a working-style module, and ends with a report you can send, print or copy for a sponsor or coach.</footer>
 </div>
 </body>
 </html>

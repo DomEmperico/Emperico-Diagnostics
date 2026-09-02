@@ -1,0 +1,16 @@
+{
+  "name": "emperico-diagnostics",
+  "compatibility_date": "2025-01-01",
+  "main": "worker.js",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS",
+    "html_handling": "none"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "LINKS",
+      "id": "6d94d3bfa4314d9392716e5452276ec5"
+    }
+  ]
+}

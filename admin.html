@@ -153,7 +153,7 @@
       <h2 style="margin-top:0;">All links</h2>
       <table id="links-table">
         <thead>
-          <tr><th>Name</th><th>Email</th><th>Tool</th><th>Edition</th><th>Status</th><th>Created</th><th>Overall</th><th></th></tr>
+          <tr><th>Name</th><th>Email</th><th>Tool</th><th>Edition</th><th>Status</th><th>Mentor</th><th>Created</th><th>Overall</th><th></th></tr>
         </thead>
         <tbody id="links-body"></tbody>
       </table>
@@ -266,12 +266,16 @@ async function loadLinks(){
       tr.addEventListener('click', () => openDetail(i));
       const created = l.createdAt ? new Date(l.createdAt).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) : '-';
       const overall = (l.results && l.results.overall != null) ? l.results.overall : '-';
+      const mentorCell = l.mentorStatus === 'completed' ? '<span class="status-completed">Done</span>'
+        : l.mentorStatus === 'pending' ? '<span class="status-pending">Pending</span>'
+        : '<span class="muted">&mdash;</span>';
       tr.innerHTML = `
         <td>${escapeHtml(l.name||'')}</td>
         <td>${escapeHtml(l.email||'')}</td>
         <td>${TOOL_LABELS[l.tool]||l.tool}</td>
         <td>${l.edition||''}</td>
         <td class="status-${l.status}">${l.status === 'completed' ? 'Completed' : 'Pending'}</td>
+        <td>${mentorCell}</td>
         <td>${created}</td>
         <td>${escapeHtml(String(overall))}</td>
         <td><button class="row-delete" type="button">Delete</button></td>
@@ -435,6 +439,35 @@ function openDetail(index){
     </table>`;
   }
 
+  let mentorHtml = '';
+  if(l.mentorStatus === 'completed' && l.mentorResults && Array.isArray(l.mentorResults.scores)){
+    const selfByArea = {};
+    scores.forEach(s => selfByArea[s.area] = parseFloat(s.score) || 0);
+    const gapRows = l.mentorResults.scores.map(ms => {
+      const selfScore = selfByArea[ms.area];
+      const mentorScore = parseFloat(ms.score) || 0;
+      const gap = (selfScore != null) ? (selfScore - mentorScore) : null;
+      return { area: ms.area, self: selfScore, mentor: mentorScore, gap };
+    }).sort((a,b) => Math.abs(b.gap||0) - Math.abs(a.gap||0));
+
+    mentorHtml = `
+      <h3>Mentor / coach comparison <span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-muted);">(internal only)</span></h3>
+      <p class="h3-sub">Self-rating vs. ${escapeHtml(l.mentorName||'mentor')}'s rating, sorted by the biggest gaps \u2014 that's where the coaching conversation has most to work with.</p>
+      <table class="full-table">
+        <tr><th>Capability area</th><th>Self</th><th>Mentor</th><th>Gap</th></tr>
+        ${gapRows.map(r => `<tr>
+          <td>${escapeHtml(r.area)}</td>
+          <td style="font-family:Georgia,serif;">${r.self!=null?r.self.toFixed(1):'-'}</td>
+          <td style="font-family:Georgia,serif;">${r.mentor.toFixed(1)}</td>
+          <td style="font-family:Georgia,serif;color:${Math.abs(r.gap||0)>=1?'#9a3b2b':'inherit'};font-weight:${Math.abs(r.gap||0)>=1?'700':'400'};">${r.gap!=null?(r.gap>0?'+':'')+r.gap.toFixed(1):'-'}</td>
+        </tr>`).join('')}
+      </table>`;
+  } else if(l.mentorStatus === 'pending'){
+    mentorHtml = `
+      <h3>Mentor / coach comparison <span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-muted);">(internal only)</span></h3>
+      <p class="no-data">A mentor link has been sent and is awaiting a response.</p>`;
+  }
+
   body.innerHTML = `
     <h2>${escapeHtml(l.name||res.name||'')}</h2>
     <p class="modal-sub">${escapeHtml(l.email||'')} &middot; ${TOOL_LABELS[l.tool]||l.tool} &middot; Edition ${l.edition||''}${res.role ? ' &middot; ' + escapeHtml(res.role) : ''}${res.line ? ' &middot; ' + escapeHtml(res.line) : ''}</p>
@@ -458,6 +491,8 @@ function openDetail(index){
 
     <h3>Working style</h3>
     ${styleHtml}
+
+    ${mentorHtml}
 
     <h3>Full results</h3>
     ${tableHtml}

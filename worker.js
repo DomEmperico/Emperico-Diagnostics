@@ -61,6 +61,19 @@ export default {
       return handleSubmitResults(request, env);
     }
 
+    if (path === "/api/create-mentor-link" && request.method === "POST") {
+      return handleCreateMentorLink(request, env, url);
+    }
+
+    if (path === "/api/submit-mentor-results" && request.method === "POST") {
+      return handleSubmitMentorResults(request, env);
+    }
+
+    if (path.startsWith("/m/") && request.method === "GET") {
+      const mentorToken = path.slice(3).trim();
+      return handleMentorLink(mentorToken, env, request);
+    }
+
     if (path.startsWith("/r/") && request.method === "GET") {
       const token = path.slice(3).trim();
       return handleRespondentLink(token, env, request);
@@ -206,6 +219,110 @@ async function handleSubmitResults(request, env) {
     const { token: _t, ...rest } = body;
     record.results = rest;
     await env.LINKS.put("link:" + token, JSON.stringify(record));
+    return json({ ok: true }, 200);
+  } catch (e) {
+    return json({ ok: false }, 200);
+  }
+}
+
+// ---------- mentor / coach scoring ----------
+
+async function handleCreateMentorLink(request, env, url) {
+  let body;
+  try { body = await request.json(); } catch (e) { return json({ ok: false, error: "Bad request" }, 400); }
+  const token = body && body.token;
+  if (!token) return json({ ok: false, error: "token is required" }, 400);
+
+  const raw = await env.LINKS.get("link:" + token);
+  if (!raw) return json({ ok: false, error: "Original link not found" }, 404);
+  const record = JSON.parse(raw);
+  if (record.status !== "completed") {
+    return json({ ok: false, error: "Finish your own assessment first" }, 400);
+  }
+
+  const mentorToken = crypto.randomUUID().replace(/-/g, "");
+  const mentorRecord = {
+    mentorToken,
+    originalToken: token,
+    tool: record.tool,
+    edition: record.edition,
+    participantName: record.name || "",
+    status: "pending",
+    createdAt: new Date().toISOString(),
+    completedAt: null,
+    results: null
+  };
+  await env.LINKS.put("mentor:" + mentorToken, JSON.stringify(mentorRecord));
+
+  record.mentorToken = mentorToken;
+  record.mentorStatus = "pending";
+  await env.LINKS.put("link:" + token, JSON.stringify(record));
+
+  const mentorUrl = new URL("/m/" + mentorToken, url.origin).toString();
+  return json({ ok: true, url: mentorUrl, participantName: record.name || "" });
+}
+
+async function handleMentorLink(mentorToken, env, request) {
+  if (!mentorToken) return notFoundPage("no-mentor-token");
+  const raw = await env.LINKS.get("mentor:" + mentorToken);
+  if (!raw) return notFoundPage("no-mentor-record");
+
+  let record;
+  try { record = JSON.parse(raw); } catch (e) { return notFoundPage("bad-mentor-record-json"); }
+
+  if (record.status === "completed") {
+    return usedPage(record);
+  }
+
+  const key = record.tool + ":" + record.edition;
+  const filePath = TOOL_FILES[key];
+  if (!filePath) return notFoundPage("unknown-mentor-tool-key:" + key);
+
+  const assetUrl = new URL(filePath, request.url);
+  const assetResp = await env.ASSETS.fetch(new Request(assetUrl, request));
+  if (!assetResp.ok) return notFoundPage("mentor-asset-fetch-failed:" + filePath + ":status-" + assetResp.status);
+
+  let html = await assetResp.text();
+  const inject =
+    `<script>window.EMPERICO_MENTOR_MODE=true;window.EMPERICO_MENTOR_TOKEN=${JSON.stringify(mentorToken)};window.EMPERICO_PARTICIPANT_NAME=${JSON.stringify(record.participantName || "")};</script>\n</head>`;
+  html = html.replace("</head>", inject);
+
+  return new Response(html, {
+    status: 200,
+    headers: { "Content-Type": "text/html; charset=UTF-8" }
+  });
+}
+
+async function handleSubmitMentorResults(request, env) {
+  try {
+    const body = await request.json();
+    const mentorToken = body && body.mentorToken;
+    if (!mentorToken) return json({ ok: false }, 200);
+
+    const raw = await env.LINKS.get("mentor:" + mentorToken);
+    if (!raw) return json({ ok: false }, 200);
+
+    const mentorRecord = JSON.parse(raw);
+    if (mentorRecord.status === "completed") return json({ ok: true }, 200);
+
+    const { mentorToken: _mt, ...rest } = body;
+    mentorRecord.status = "completed";
+    mentorRecord.completedAt = new Date().toISOString();
+    mentorRecord.results = rest;
+    await env.LINKS.put("mentor:" + mentorToken, JSON.stringify(mentorRecord));
+
+    // denormalise onto the original participant's record so /admin can read
+    // both sides from a single lookup
+    const originalRaw = await env.LINKS.get("link:" + mentorRecord.originalToken);
+    if (originalRaw) {
+      const original = JSON.parse(originalRaw);
+      original.mentorStatus = "completed";
+      original.mentorCompletedAt = mentorRecord.completedAt;
+      original.mentorResults = rest;
+      original.mentorName = rest.name || "";
+      await env.LINKS.put("link:" + mentorRecord.originalToken, JSON.stringify(original));
+    }
+
     return json({ ok: true }, 200);
   } catch (e) {
     return json({ ok: false }, 200);

@@ -153,7 +153,7 @@
       <h2 style="margin-top:0;">All links</h2>
       <table id="links-table">
         <thead>
-          <tr><th>Name</th><th>Email</th><th>Tool</th><th>Edition</th><th>Status</th><th>Mentor</th><th>Created</th><th>Overall</th><th></th></tr>
+          <tr><th>Name</th><th>Email</th><th>Tool</th><th>Edition</th><th>Status</th><th>Line manager</th><th>Created</th><th>Overall</th><th></th></tr>
         </thead>
         <tbody id="links-body"></tbody>
       </table>
@@ -300,17 +300,6 @@ async function deleteLink(token, name){
   }catch(e){}
 }
 
-const RADAR_CODES = {
-  "Lead the Business":"LEAD","Grow Clients & Revenue":"GROW","Develop People":"PPL",
-  "Integrity & Accountability":"INT","Cultural Leadership":"CULT","Champion Change":"CHG",
-  "Stewardship & Risk":"STW","Build Your Successor":"SUC","Own Succession":"SUC",
-  "Set the Direction":"DIR","Lead Through Others":"LTO","Let Go of the Doing":"LGD",
-  "Own the Numbers":"NUM","Build the Bench":"BEN","Align the Partner Group":"ALN",
-  "Lead the Change":"LDCH","Be the Face":"FACE"
-};
-function radarCode(name){ return RADAR_CODES[name] || String(name||'').slice(0,4).toUpperCase(); }
-function radarTruncate(str, n){ str = String(str||''); return str.length>n ? str.slice(0,n-1)+'\u2026' : str; }
-
 function bandColor(score){
   const n = parseFloat(score) || 0;
   if(n >= 4.2) return '#8a7024';
@@ -318,15 +307,27 @@ function bandColor(score){
   if(n >= 2.6) return '#c9a35f';
   return '#9a3b2b';
 }
+function radarWrap(name, maxChars){
+  const words = String(name||'').split(' ');
+  const lines = [];
+  let cur = '';
+  words.forEach(w=>{
+    const test = cur ? cur + ' ' + w : w;
+    if(test.length > maxChars && cur){ lines.push(cur); cur = w; }
+    else { cur = test; }
+  });
+  if(cur) lines.push(cur);
+  return lines;
+}
 
 function buildRadarSVG(scores){
-  const size = 520, cx = size/2, cy = size/2, maxR = 170;
+  const size = 640, cx = size/2, cy = size/2, maxR = 210;
   const n = scores.length;
   const pt = (i, r) => {
     const angle = (-90 + i * (360/n)) * Math.PI/180;
     return [cx + r*Math.cos(angle), cy + r*Math.sin(angle)];
   };
-  let svg = `<svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:480px;display:block;margin:0 auto;">`;
+  let svg = `<svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:560px;display:block;margin:0 auto;">`;
 
   for(let lvl=1; lvl<=5; lvl++){
     const r = (lvl/5)*maxR;
@@ -342,22 +343,25 @@ function buildRadarSVG(scores){
   scores.forEach((s,i)=>{
     const [x,y] = dataPts[i];
     svg += `<circle cx="${x}" cy="${y}" r="6" fill="${bandColor(s.score)}" stroke="#fbf9f4" stroke-width="2"/>`;
-    const [lx,ly] = pt(i, maxR + 42);
+    const [lx,ly] = pt(i, maxR + 28);
     const dx = lx - cx;
     const anchor = Math.abs(dx) < 6 ? 'middle' : (dx > 0 ? 'start' : 'end');
-    const code = radarCode(s.area);
-    const nm = radarTruncate(s.area, 15);
-    svg += `<text x="${lx}" y="${ly}" font-size="12.5" font-family="Georgia,serif" font-weight="700" fill="#152238" text-anchor="${anchor}">${code}</text>`;
-    svg += `<text x="${lx}" y="${ly+13}" font-size="9.5" font-family="-apple-system,sans-serif" fill="#7d7562" text-anchor="${anchor}">${nm}</text>`;
-    svg += `<text x="${lx}" y="${ly+25}" font-size="10.5" font-family="Georgia,serif" fill="#152238" text-anchor="${anchor}">${escapeHtml(String(s.score))}</text>`;
+    const nameLines = radarWrap(s.area, 14);
+    let ly2 = ly;
+    nameLines.forEach(line=>{
+      svg += `<text x="${lx}" y="${ly2}" font-size="11.5" font-family="Georgia,serif" font-weight="700" fill="#152238" text-anchor="${anchor}">${escapeHtml(line)}</text>`;
+      ly2 += 13;
+    });
+    svg += `<text x="${lx}" y="${ly2}" font-size="10.5" font-family="Georgia,serif" fill="#7d7562" text-anchor="${anchor}">${escapeHtml(String(s.score))}</text>`;
   });
   const overall = (scores.reduce((a,s)=>a+(parseFloat(s.score)||0),0)/n).toFixed(1);
-  svg += `<circle cx="${cx}" cy="${cy}" r="38" fill="#0d1c39"/>`;
-  svg += `<text x="${cx}" y="${cy-3}" font-size="21" font-family="Georgia,serif" font-weight="700" fill="#f3efe6" text-anchor="middle">${overall}</text>`;
-  svg += `<text x="${cx}" y="${cy+14}" font-size="8.5" fill="#c9b489" text-anchor="middle" letter-spacing="1">OVERALL</text>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="40" fill="#0d1c39"/>`;
+  svg += `<text x="${cx}" y="${cy-3}" font-size="22" font-family="Georgia,serif" font-weight="700" fill="#f3efe6" text-anchor="middle">${overall}</text>`;
+  svg += `<text x="${cx}" y="${cy+15}" font-size="9" fill="#c9b489" text-anchor="middle" letter-spacing="1">OVERALL</text>`;
   svg += `</svg>`;
   return svg;
 }
+
 
 function openDetail(index){
   const l = LINKS_CACHE[index];
@@ -450,22 +454,52 @@ function openDetail(index){
       return { area: ms.area, self: selfScore, mentor: mentorScore, gap };
     }).sort((a,b) => Math.abs(b.gap||0) - Math.abs(a.gap||0));
 
+    const barChartRows = gapRows.map(r => {
+      const selfPct = Math.max(0, Math.min(100, ((r.self||0)/5)*100));
+      const mgrPct = Math.max(0, Math.min(100, (r.mentor/5)*100));
+      const gapAbs = Math.abs(r.gap||0);
+      const gapColor = gapAbs >= 1.5 ? '#9a3b2b' : gapAbs >= 0.8 ? '#c9a35f' : '#7d9070';
+      return `
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+            <span>${escapeHtml(r.area)}</span>
+            <span style="color:${gapColor};font-weight:600;">${r.gap!=null?(r.gap>0?'+':'')+r.gap.toFixed(1):'-'} gap</span>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr;align-items:center;gap:8px;margin-bottom:3px;">
+            <span style="font-size:11px;color:var(--text-muted);">Self</span>
+            <div class="ft-bar-track"><div class="ft-bar-fill" style="width:${selfPct}%;background:#0d1c39;"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:50px 1fr;align-items:center;gap:8px;">
+            <span style="font-size:11px;color:var(--text-muted);">Manager</span>
+            <div class="ft-bar-track"><div class="ft-bar-fill" style="width:${mgrPct}%;background:#a08243;"></div></div>
+          </div>
+        </div>`;
+    }).join('');
+
+    const focusHtml = l.mentorResults.focusArea ? `
+      <div style="margin-top:18px;padding:14px 16px;border:1px solid var(--border);border-radius:3px;background:#fff;">
+        <div class="sc-label" style="margin-top:0;">Line manager's 6-month focus recommendation</div>
+        <p style="margin:0;font-size:14.5px;">${escapeHtml(l.mentorResults.focusArea)}</p>
+      </div>` : '';
+
     mentorHtml = `
-      <h3>Mentor / coach comparison <span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-muted);">(internal only)</span></h3>
-      <p class="h3-sub">Self-rating vs. ${escapeHtml(l.mentorName||'mentor')}'s rating, sorted by the biggest gaps \u2014 that's where the coaching conversation has most to work with.</p>
+      <h3>Line manager comparison <span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-muted);">(internal only)</span></h3>
+      <p class="h3-sub">Self-rating vs. ${escapeHtml(l.mentorName||'their line manager')}'s rating, sorted by the biggest gaps \u2014 that's where the coaching conversation has most to work with.</p>
+      <div style="margin-bottom:22px;">${barChartRows}</div>
       <table class="full-table">
-        <tr><th>Capability area</th><th>Self</th><th>Mentor</th><th>Gap</th></tr>
+        <tr><th>Capability area</th><th>Self</th><th>Manager</th><th>Gap</th></tr>
         ${gapRows.map(r => `<tr>
           <td>${escapeHtml(r.area)}</td>
           <td style="font-family:Georgia,serif;">${r.self!=null?r.self.toFixed(1):'-'}</td>
           <td style="font-family:Georgia,serif;">${r.mentor.toFixed(1)}</td>
           <td style="font-family:Georgia,serif;color:${Math.abs(r.gap||0)>=1?'#9a3b2b':'inherit'};font-weight:${Math.abs(r.gap||0)>=1?'700':'400'};">${r.gap!=null?(r.gap>0?'+':'')+r.gap.toFixed(1):'-'}</td>
         </tr>`).join('')}
-      </table>`;
+      </table>
+      ${focusHtml}`;
   } else if(l.mentorStatus === 'pending'){
     mentorHtml = `
-      <h3>Mentor / coach comparison <span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-muted);">(internal only)</span></h3>
-      <p class="no-data">A mentor link has been sent and is awaiting a response.</p>`;
+      <h3>Line manager comparison <span style="font-size:11px;text-transform:none;letter-spacing:0;color:var(--text-muted);">(internal only)</span></h3>
+      <p class="no-data">A line manager link has been sent and is awaiting a response.</p>`;
   }
 
   body.innerHTML = `

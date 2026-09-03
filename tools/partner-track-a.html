@@ -390,7 +390,7 @@
       <div><label for="f-line">Service line</label><input id="f-line" type="text" placeholder="e.g. Audit, Tax, Advisory"></div>
       <div><label for="f-date">Date</label><input id="f-date" type="date"></div>
     </div>
-    <p class="note">Be honest rather than kind to yourself. This works best when you also ask a sponsor or mentor to complete the companion version about you and compare notes — that conversation is where the value is.</p>
+    <p class="note">Be honest rather than kind to yourself. This works best when you also ask a sponsor or line manager to complete the companion version about you and compare notes — that conversation is where the value is.</p>
     <div class="nav"><span></span><button class="btn primary" onclick="startAssessment()">Begin the diagnostic</button></div>
   </section>
 
@@ -426,6 +426,18 @@
 
   <!-- RESULTS -->
   <section class="screen" id="screen-results"></section>
+
+  <!-- LINE MANAGER FOCUS QUESTION -->
+  <section class="screen panel" id="screen-mentor-focus">
+    <div class="kicker">Final Step</div>
+    <h2>One last thing</h2>
+    <p class="dim-intro">Your perspective here is often the most useful part of this exercise.</p>
+    <div class="refl-block"><label for="mgrFocus">What's the most important area for this person to focus on developing over the next 6 months?</label><textarea id="mgrFocus"></textarea></div>
+    <div class="nav">
+      <button class="btn ghost" onclick="goToDim(DIMS.length-1)">Back</button>
+      <button class="btn primary" onclick="finishMentor()">Submit</button>
+    </div>
+  </section>
 
   <!-- MENTOR THANK YOU -->
   <section class="screen panel" id="screen-mentor-done">
@@ -988,7 +1000,7 @@ function nextFromDim(di){
     return;
   }
   warn.style.display='none';
-  if(di===DIMS.length-1){ MENTOR_MODE ? finishMentor() : showStyleScreen(); }
+  if(di===DIMS.length-1){ MENTOR_MODE ? show('screen-mentor-focus') : showStyleScreen(); }
   else goToDim(di+1);
 }
 
@@ -1004,6 +1016,7 @@ function finishMentor(){
   const scores = DIMS.map((d,di)=>({di, name:d.name, score:dimScore(di)}));
   const overall = scores.reduce((a,s)=>a+s.score,0)/scores.length;
   const name = document.getElementById('f-name').value.trim();
+  const focusArea = document.getElementById('mgrFocus') ? document.getElementById('mgrFocus').value.trim() : "";
   try{
     fetch("/api/submit-mentor-results", {
       method:"POST", mode:"no-cors",
@@ -1013,6 +1026,7 @@ function finishMentor(){
         name,
         overall: fmt(overall),
         scores: scores.map(s=>({area:s.name, score:fmt(s.score), band:bandFor(s.score).label, bandKey:bandFor(s.score).key})),
+        focusArea,
         answers
       })
     });
@@ -1028,24 +1042,26 @@ function radarBandColor(score){
   if(n >= 2.6) return "#c9a35f";
   return "#9a3b2b";
 }
-const RADAR_CODES = {
-  "Lead the Business":"LEAD","Grow Clients & Revenue":"GROW","Develop People":"PPL",
-  "Integrity & Accountability":"INT","Cultural Leadership":"CULT","Champion Change":"CHG",
-  "Stewardship & Risk":"STW","Build Your Successor":"SUC","Own Succession":"SUC",
-  "Set the Direction":"DIR","Lead Through Others":"LTO","Let Go of the Doing":"LGD",
-  "Own the Numbers":"NUM","Build the Bench":"BEN","Align the Partner Group":"ALN",
-  "Lead the Change":"LDCH","Be the Face":"FACE"
-};
-function radarCode(name){ return RADAR_CODES[name] || String(name).slice(0,4).toUpperCase(); }
-function radarTruncate(str, n){ str = String(str||""); return str.length>n ? str.slice(0,n-1)+"\u2026" : str; }
+function radarWrap(name, maxChars){
+  const words = String(name||"").split(" ");
+  const lines = [];
+  let cur = "";
+  words.forEach(w=>{
+    const test = cur ? cur + " " + w : w;
+    if(test.length > maxChars && cur){ lines.push(cur); cur = w; }
+    else { cur = test; }
+  });
+  if(cur) lines.push(cur);
+  return lines;
+}
 function buildRadarSVG(scores, mode){
   const theme = mode === "dark"
     ? { grid:"rgba(255,255,255,.18)", text:"#f2ede0", sub:"#c9b6a8", fill:"#c9a35f", fillOpacity:0.20, stroke:"#c9a35f", centerBg:"#c9a35f", centerText:"#1d140f", centerSub:"#4a3323", halo:"#20110f" }
     : { grid:"#ddd2ba", text:"#152238", sub:"#7d7562", fill:"#a08243", fillOpacity:0.22, stroke:"#0d1c39", centerBg:"#0d1c39", centerText:"#f3efe6", centerSub:"#c9b489", halo:"#fbf9f4" };
-  const size = 520, cx = size/2, cy = size/2, maxR = 170;
+  const size = 640, cx = size/2, cy = size/2, maxR = 210;
   const n = scores.length;
   const pt = (i, r) => { const a = (-90 + i*(360/n)) * Math.PI/180; return [cx + r*Math.cos(a), cy + r*Math.sin(a)]; };
-  let svg = `<svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:480px;display:block;margin:0 auto;">`;
+  let svg = `<svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:560px;display:block;margin:0 auto;">`;
   for(let lvl=1; lvl<=5; lvl++){
     const r = (lvl/5)*maxR;
     const pts = scores.map((_,i)=>pt(i,r).join(",")).join(" ");
@@ -1057,22 +1073,25 @@ function buildRadarSVG(scores, mode){
   scores.forEach((s,i)=>{
     const [x,y] = dataPts[i];
     svg += `<circle cx="${x}" cy="${y}" r="6" fill="${radarBandColor(s.score)}" stroke="${theme.halo}" stroke-width="2"/>`;
-    const [lx,ly] = pt(i, maxR + 42);
+    const [lx,ly] = pt(i, maxR + 28);
     const dx = lx - cx;
     const anchor = Math.abs(dx) < 6 ? "middle" : (dx > 0 ? "start" : "end");
-    const code = radarCode(s.name);
-    const nm = radarTruncate(s.name, 15);
-    svg += `<text x="${lx}" y="${ly}" font-size="12.5" font-family="Georgia,serif" font-weight="700" fill="${theme.text}" text-anchor="${anchor}">${code}</text>`;
-    svg += `<text x="${lx}" y="${ly+13}" font-size="9.5" font-family="-apple-system,sans-serif" fill="${theme.sub}" text-anchor="${anchor}">${nm}</text>`;
-    svg += `<text x="${lx}" y="${ly+25}" font-size="10.5" font-family="Georgia,serif" fill="${theme.text}" text-anchor="${anchor}">${fmt(s.score)}</text>`;
+    const nameLines = radarWrap(s.name, 14);
+    let ly2 = ly;
+    nameLines.forEach((line,li)=>{
+      svg += `<text x="${lx}" y="${ly2}" font-size="11.5" font-family="Georgia,serif" font-weight="700" fill="${theme.text}" text-anchor="${anchor}">${line}</text>`;
+      ly2 += 13;
+    });
+    svg += `<text x="${lx}" y="${ly2}" font-size="10.5" font-family="Georgia,serif" fill="${theme.sub}" text-anchor="${anchor}">${fmt(s.score)}</text>`;
   });
   const overall = scores.reduce((a,s)=>a+(parseFloat(s.score)||0),0)/n;
-  svg += `<circle cx="${cx}" cy="${cy}" r="38" fill="${theme.centerBg}"/>`;
-  svg += `<text x="${cx}" y="${cy-3}" font-size="21" font-family="Georgia,serif" font-weight="700" fill="${theme.centerText}" text-anchor="middle">${fmt(overall)}</text>`;
-  svg += `<text x="${cx}" y="${cy+14}" font-size="8.5" fill="${theme.centerSub}" text-anchor="middle" letter-spacing="1">OVERALL</text>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="40" fill="${theme.centerBg}"/>`;
+  svg += `<text x="${cx}" y="${cy-3}" font-size="22" font-family="Georgia,serif" font-weight="700" fill="${theme.centerText}" text-anchor="middle">${fmt(overall)}</text>`;
+  svg += `<text x="${cx}" y="${cy+15}" font-size="9" fill="${theme.centerSub}" text-anchor="middle" letter-spacing="1">OVERALL</text>`;
   svg += `</svg>`;
   return svg;
 }
+
 
 function showResults(){
   const scores = DIMS.map((d,di)=>({di, name:d.name, score:dimScore(di)}));
@@ -1198,7 +1217,7 @@ function showResults(){
 
   html += `<div class="res-panel steps"><div class="kicker">What To Do With This</div>
     <p><b>Send it.</b> Share your results with Emperico below — they inform your development conversations and how we support you from here.</p>
-    <p><b>Share it.</b> Print or save this report and take it to your sponsor, mentor or coach. Ask them where they would have rated you differently — the disagreements are the most valuable data you will get.</p>
+    <p><b>Share it.</b> Print or save this report and take it to your sponsor, line manager or coach. Ask them where they would have rated you differently — the disagreements are the most valuable data you will get.</p>
     <p><b>Turn the priorities into a plan.</b> For each development area above, agree one visible commitment for the next 90 days.</p>
     <p><b>Re-assess.</b> Retake this diagnostic in six months and compare the movement. Readiness is a trajectory, not a score.</p>
     <div class="actions noprint">
@@ -1359,7 +1378,7 @@ if(MENTOR_MODE){
   var _introEpi = document.querySelector("#screen-intro .epigraph");
   var _introLeads = document.querySelectorAll("#screen-intro .lead");
   var _introNote = document.querySelector("#screen-intro .note");
-  if(_introH1) _introH1.textContent = PARTICIPANT_NAME ? ("Rating " + PARTICIPANT_NAME) : "A mentor's view";
+  if(_introH1) _introH1.textContent = PARTICIPANT_NAME ? ("Rating " + PARTICIPANT_NAME) : "A line manager's view";
   if(_introEpi) _introEpi.textContent = "You've been asked to give your honest view of " + (PARTICIPANT_NAME || "a colleague") + " against this framework.";
   if(_introLeads && _introLeads[0]) _introLeads[0].textContent = "Your answers are confidential to Emperico and will not be shown to " + (PARTICIPANT_NAME || "them") + " directly. Please rate them as you see them today, not as you'd like them to be — honest, specific answers are what make this useful.";
   if(_introLeads && _introLeads[1]) _introLeads[1].style.display = "none";

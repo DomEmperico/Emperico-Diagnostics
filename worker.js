@@ -52,6 +52,11 @@ export default {
       return handleCreateLink(request, env, url);
     }
 
+    if (path === "/api/delete-link" && request.method === "POST") {
+      if (!(await isAuthed(request, env))) return json({ ok: false, error: "Unauthorized" }, 401);
+      return handleDeleteLink(request, env);
+    }
+
     if (path === "/api/submit-results" && request.method === "POST") {
       return handleSubmitResults(request, env);
     }
@@ -126,6 +131,15 @@ async function handleCreateLink(request, env, url) {
 
   const link = new URL("/r/" + token, url.origin).toString();
   return json({ ok: true, url: link, token });
+}
+
+async function handleDeleteLink(request, env) {
+  let body;
+  try { body = await request.json(); } catch (e) { return json({ ok: false, error: "Bad request" }, 400); }
+  const token = body && body.token;
+  if (!token) return json({ ok: false, error: "token is required" }, 400);
+  await env.LINKS.delete("link:" + token);
+  return json({ ok: true });
 }
 
 async function handleAdminLinks(env) {

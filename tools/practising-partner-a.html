@@ -1033,6 +1033,59 @@ function bandFor(score){ return BANDS.find(b=>score>=b.min); }
 function overallBandFor(score){ return OVERALL_BANDS.find(b=>score>=b.min); }
 function fmt(n){ return (Math.round(n*10)/10).toFixed(1); }
 
+function radarBandColor(score){
+  const n = parseFloat(score) || 0;
+  if(n >= 4.2) return "#8a7024";
+  if(n >= 3.4) return "#2f4f7a";
+  if(n >= 2.6) return "#c9a35f";
+  return "#9a3b2b";
+}
+const RADAR_CODES = {
+  "Lead the Business":"LEAD","Grow Clients & Revenue":"GROW","Develop People":"PPL",
+  "Integrity & Accountability":"INT","Cultural Leadership":"CULT","Champion Change":"CHG",
+  "Stewardship & Risk":"STW","Build Your Successor":"SUC","Own Succession":"SUC",
+  "Set the Direction":"DIR","Lead Through Others":"LTO","Let Go of the Doing":"LGD",
+  "Own the Numbers":"NUM","Build the Bench":"BEN","Align the Partner Group":"ALN",
+  "Lead the Change":"LDCH","Be the Face":"FACE"
+};
+function radarCode(name){ return RADAR_CODES[name] || String(name).slice(0,4).toUpperCase(); }
+function radarTruncate(str, n){ str = String(str||""); return str.length>n ? str.slice(0,n-1)+"\u2026" : str; }
+function buildRadarSVG(scores, mode){
+  const theme = mode === "dark"
+    ? { grid:"rgba(255,255,255,.18)", text:"#f2ede0", sub:"#c9b6a8", fill:"#c9a35f", fillOpacity:0.20, stroke:"#c9a35f", centerBg:"#c9a35f", centerText:"#1d140f", centerSub:"#4a3323", halo:"#20110f" }
+    : { grid:"#ddd2ba", text:"#152238", sub:"#7d7562", fill:"#a08243", fillOpacity:0.22, stroke:"#0d1c39", centerBg:"#0d1c39", centerText:"#f3efe6", centerSub:"#c9b489", halo:"#fbf9f4" };
+  const size = 520, cx = size/2, cy = size/2, maxR = 170;
+  const n = scores.length;
+  const pt = (i, r) => { const a = (-90 + i*(360/n)) * Math.PI/180; return [cx + r*Math.cos(a), cy + r*Math.sin(a)]; };
+  let svg = `<svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:480px;display:block;margin:0 auto;">`;
+  for(let lvl=1; lvl<=5; lvl++){
+    const r = (lvl/5)*maxR;
+    const pts = scores.map((_,i)=>pt(i,r).join(",")).join(" ");
+    svg += `<polygon points="${pts}" fill="none" stroke="${theme.grid}" stroke-width="1"/>`;
+  }
+  scores.forEach((_,i)=>{ const [x,y] = pt(i,maxR); svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${theme.grid}" stroke-width="1"/>`; });
+  const dataPts = scores.map((s,i)=> pt(i, (Math.min(5,parseFloat(s.score)||0)/5)*maxR));
+  svg += `<polygon points="${dataPts.map(p=>p.join(",")).join(" ")}" fill="${theme.fill}" fill-opacity="${theme.fillOpacity}" stroke="${theme.stroke}" stroke-width="2"/>`;
+  scores.forEach((s,i)=>{
+    const [x,y] = dataPts[i];
+    svg += `<circle cx="${x}" cy="${y}" r="6" fill="${radarBandColor(s.score)}" stroke="${theme.halo}" stroke-width="2"/>`;
+    const [lx,ly] = pt(i, maxR + 42);
+    const dx = lx - cx;
+    const anchor = Math.abs(dx) < 6 ? "middle" : (dx > 0 ? "start" : "end");
+    const code = radarCode(s.name);
+    const nm = radarTruncate(s.name, 15);
+    svg += `<text x="${lx}" y="${ly}" font-size="12.5" font-family="Georgia,serif" font-weight="700" fill="${theme.text}" text-anchor="${anchor}">${code}</text>`;
+    svg += `<text x="${lx}" y="${ly+13}" font-size="9.5" font-family="-apple-system,sans-serif" fill="${theme.sub}" text-anchor="${anchor}">${nm}</text>`;
+    svg += `<text x="${lx}" y="${ly+25}" font-size="10.5" font-family="Georgia,serif" fill="${theme.text}" text-anchor="${anchor}">${fmt(s.score)}</text>`;
+  });
+  const overall = scores.reduce((a,s)=>a+(parseFloat(s.score)||0),0)/n;
+  svg += `<circle cx="${cx}" cy="${cy}" r="38" fill="${theme.centerBg}"/>`;
+  svg += `<text x="${cx}" y="${cy-3}" font-size="21" font-family="Georgia,serif" font-weight="700" fill="${theme.centerText}" text-anchor="middle">${fmt(overall)}</text>`;
+  svg += `<text x="${cx}" y="${cy+14}" font-size="8.5" fill="${theme.centerSub}" text-anchor="middle" letter-spacing="1">OVERALL</text>`;
+  svg += `</svg>`;
+  return svg;
+}
+
 function showResults(){
   const scores = DIMS.map((d,di)=>({di, name:d.name, score:dimScore(di)}));
   const overall = scores.reduce((a,s)=>a+s.score,0)/scores.length;
@@ -1080,6 +1133,12 @@ function showResults(){
       <span class="tick" style="left:0">0</span>
     </div></div>
   </div></div>`;
+
+  html += `<div class="res-panel">
+    <div class="kicker">Compass View</div>
+    <div class="viz-sub">The same scores, plotted by area — distance from centre = score, colour = band.</div>
+    ${buildRadarSVG(scores, "dark")}
+  </div>`;
 
   /* working style panel */
   if(styleComplete()){

@@ -427,6 +427,13 @@
   <!-- RESULTS -->
   <section class="screen" id="screen-results"></section>
 
+  <!-- MENTOR THANK YOU -->
+  <section class="screen panel" id="screen-mentor-done">
+    <div class="kicker">Thank you</div>
+    <h2>Your input has been recorded</h2>
+    <p class="lead">Thank you for taking the time to rate <span id="mentorDoneName">your colleague</span> against this framework. Your answers have been sent directly to Emperico and are not visible to you again from here — they'll be used alongside the self-assessment as part of the coaching conversation.</p>
+  </section>
+
   <footer class="colophon">
     <svg class="flogo" viewBox="0 0 1540 454" aria-hidden="true">
       <g transform="translate(-16.225463,487.822967) scale(0.1,-0.1)">
@@ -708,6 +715,21 @@ const OVERALL_BANDS = [
 const RESULTS_EMAIL = "mark@empericogroup.com";
 const RESULTS_ENDPOINT = "/api/submit-results";
 const LINK_TOKEN = (typeof window !== "undefined" && window.EMPERICO_TOKEN) || "";
+const MENTOR_MODE = (typeof window !== "undefined" && !!window.EMPERICO_MENTOR_MODE);
+const MENTOR_TOKEN = (typeof window !== "undefined" && window.EMPERICO_MENTOR_TOKEN) || "";
+const PARTICIPANT_NAME = (typeof window !== "undefined" && window.EMPERICO_PARTICIPANT_NAME) || "";
+
+function toThirdPerson(text){
+  if(!MENTOR_MODE) return text;
+  let t = String(text);
+  t = t.replace(/\bI'm\b/g, "They're").replace(/\bI've\b/g, "They've")
+       .replace(/\bI'll\b/g, "They'll").replace(/\bI'd\b/g, "They'd");
+  t = t.replace(/\bI\b/g, "They");
+  t = t.replace(/\bMy\b/g, "Their").replace(/\bmy\b/g, "their");
+  t = t.replace(/\bmyself\b/g, "themselves");
+  t = t.replace(/\bme\b/g, "them");
+  return t;
+}
 
 let answers = {};
 let currentDim = -1;
@@ -903,9 +925,10 @@ function buildScreens(){
       <h2>${d.name}</h2><p class="dim-intro">${d.intro}</p>
       <div class="scale-legend">${SCALE.map(s=>`<div class="cell"><b>${s.s}</b>${s.label}</div>`).join('')}</div>`;
     d.items.forEach((it,ii)=>{
+      const itText = toThirdPerson(it);
       html += `<div class="item" id="item-${di}-${ii}">
-        <div class="stmt"><span class="num">${di+1}.${ii+1}</span>${it}</div>
-        <div class="opts" role="radiogroup" aria-label="${it}">` +
+        <div class="stmt"><span class="num">${di+1}.${ii+1}</span>${itText}</div>
+        <div class="opts" role="radiogroup" aria-label="${itText}">` +
         SCALE.map(s=>`<button type="button" aria-label="${s.label}" onclick="pick(${di},${ii},${s.v},this)">${s.s}</button>`).join('') +
         `</div></div>`;
     });
@@ -965,7 +988,7 @@ function nextFromDim(di){
     return;
   }
   warn.style.display='none';
-  if(di===DIMS.length-1){ showStyleScreen(); }
+  if(di===DIMS.length-1){ MENTOR_MODE ? finishMentor() : showStyleScreen(); }
   else goToDim(di+1);
 }
 
@@ -976,6 +999,27 @@ function dimScore(di){
 function bandFor(score){ return BANDS.find(b=>score>=b.min); }
 function overallBandFor(score){ return OVERALL_BANDS.find(b=>score>=b.min); }
 function fmt(n){ return (Math.round(n*10)/10).toFixed(1); }
+
+function finishMentor(){
+  const scores = DIMS.map((d,di)=>({di, name:d.name, score:dimScore(di)}));
+  const overall = scores.reduce((a,s)=>a+s.score,0)/scores.length;
+  const name = document.getElementById('f-name').value.trim();
+  try{
+    fetch("/api/submit-mentor-results", {
+      method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        mentorToken: MENTOR_TOKEN,
+        name,
+        overall: fmt(overall),
+        scores: scores.map(s=>({area:s.name, score:fmt(s.score), band:bandFor(s.score).label, bandKey:bandFor(s.score).key})),
+        answers
+      })
+    });
+  }catch(e){}
+  document.getElementById('progress').style.display='none';
+  show('screen-mentor-done');
+}
 
 function radarBandColor(score){
   const n = parseFloat(score) || 0;
@@ -1161,6 +1205,7 @@ function showResults(){
       <button class="btn primary" onclick="sendResults()">Send my results to Emperico</button>
       <button class="btn ghost" onclick="window.print()">Print / save as PDF</button>
       <button class="btn ghost" onclick="copySummary()">Copy summary for your sponsor</button>
+      <button class="btn ghost" onclick="sendToManager(this)">Send this link to my line manager</button>
       <button class="btn ghost" onclick="restart()">Start again</button>
       <span class="copied" id="copiedMsg">Copied to clipboard</span>
     </div></div>`;
@@ -1247,6 +1292,29 @@ function sendResults(){
     "&body=" + encodeURIComponent(body);
 }
 
+function sendToManager(btn){
+  if(!LINK_TOKEN){ alert("This is only available when accessed via your personal link."); return; }
+  const original = btn ? btn.textContent : null;
+  if(btn){ btn.textContent = "Preparing link…"; btn.disabled = true; }
+  fetch("/api/create-mentor-link", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ token: LINK_TOKEN })
+  }).then(r=>r.json()).then(data=>{
+    if(btn){ btn.textContent = original; btn.disabled = false; }
+    if(!data.ok){ alert(data.error || "Couldn't create a link right now — try again."); return; }
+    const r = window._results;
+    const subject = "A quick input on my self-assessment";
+    const body = "Hi,\n\nI've just completed my " + document.title.replace("Emperico — ", "") +
+      " self-assessment. I'd really value your view too — it takes about 15 minutes and your answers " +
+      "go straight to Emperico, not to me directly, so please be honest.\n\n" +
+      "Here's the link: " + data.url + "\n\nThanks so much,\n" + (r && r.name ? r.name : "");
+    window.location.href = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  }).catch(()=>{
+    if(btn){ btn.textContent = original; btn.disabled = false; }
+    alert("Couldn't reach the server — try again.");
+  });
+}
+
 function postResults(){
   if(!RESULTS_ENDPOINT) return;
   try{
@@ -1284,6 +1352,19 @@ function escapeHtml(s){
 buildScreens();
 buildStyleScreen();
 if(typeof window !== "undefined" && window.EMPERICO_NAME){ var _n = document.getElementById("f-name"); if(_n) _n.value = window.EMPERICO_NAME; }
+if(MENTOR_MODE){
+  var _mdn = document.getElementById("mentorDoneName");
+  if(_mdn && PARTICIPANT_NAME) _mdn.textContent = PARTICIPANT_NAME;
+  var _introH1 = document.querySelector("#screen-intro h1");
+  var _introEpi = document.querySelector("#screen-intro .epigraph");
+  var _introLeads = document.querySelectorAll("#screen-intro .lead");
+  var _introNote = document.querySelector("#screen-intro .note");
+  if(_introH1) _introH1.textContent = PARTICIPANT_NAME ? ("Rating " + PARTICIPANT_NAME) : "A mentor's view";
+  if(_introEpi) _introEpi.textContent = "You've been asked to give your honest view of " + (PARTICIPANT_NAME || "a colleague") + " against this framework.";
+  if(_introLeads && _introLeads[0]) _introLeads[0].textContent = "Your answers are confidential to Emperico and will not be shown to " + (PARTICIPANT_NAME || "them") + " directly. Please rate them as you see them today, not as you'd like them to be — honest, specific answers are what make this useful.";
+  if(_introLeads && _introLeads[1]) _introLeads[1].style.display = "none";
+  if(_introNote) _introNote.style.display = "none";
+}
 </script>
 </body>
 </html>

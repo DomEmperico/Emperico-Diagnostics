@@ -176,6 +176,40 @@ async function handleAdminLinks(env) {
 
 // ---------- respondent-facing ----------
 
+// Bump this whenever the Worker changes. It is printed on the "not valid" page's
+// debug line, so you can tell at a glance which version of the code is live.
+const BUILD = "r3";
+
+// Finds a tool's HTML file. Tries the expected spot first (tools/<name>), then the
+// same name with .html, then the top level of the repo, following any redirects the
+// asset service answers with. Returns the response (or null) plus a trace of every
+// attempt, so a failure explains itself.
+async function fetchToolAsset(env, request, filePath) {
+  const name = filePath.split("/").pop();
+  const candidates = [filePath, filePath + ".html", "/" + name, "/" + name + ".html"];
+  const trace = [];
+  for (const candidate of candidates) {
+    let resp;
+    try {
+      resp = await env.ASSETS.fetch(new Request(new URL(candidate, request.url).toString(), { method: "GET" }));
+    } catch (e) {
+      trace.push(candidate + "=error");
+      continue;
+    }
+    let hops = 0;
+    while ([301, 302, 303, 307, 308].includes(resp.status) && hops < 2) {
+      const loc = resp.headers.get("Location");
+      if (!loc) break;
+      trace.push(candidate + "=" + resp.status + "->" + loc);
+      resp = await env.ASSETS.fetch(new Request(new URL(loc, request.url).toString(), { method: "GET" }));
+      hops++;
+    }
+    trace.push(candidate + "=" + resp.status);
+    if (resp.status === 200) return { resp, trace };
+  }
+  return { resp: null, trace };
+}
+
 async function handleRespondentLink(token, env, request) {
   if (!token) return notFoundPage("no-token");
   const raw = await env.LINKS.get("link:" + token);
@@ -192,9 +226,9 @@ async function handleRespondentLink(token, env, request) {
   const filePath = TOOL_FILES[key];
   if (!filePath) return notFoundPage("unknown-tool-key:" + key);
 
-  const assetUrl = new URL(filePath, request.url);
-  const assetResp = await env.ASSETS.fetch(new Request(assetUrl, request));
-  if (!assetResp.ok) return notFoundPage("asset-fetch-failed:" + filePath + ":status-" + assetResp.status);
+  const found = await fetchToolAsset(env, request, filePath);
+  if (!found.resp) return notFoundPage(BUILD + " asset-not-found: " + found.trace.join(" | "));
+  const assetResp = found.resp;
 
   let html = await assetResp.text();
   const inject =
@@ -285,9 +319,9 @@ async function handleMentorLink(mentorToken, env, request) {
   const filePath = TOOL_FILES[key];
   if (!filePath) return notFoundPage("unknown-mentor-tool-key:" + key);
 
-  const assetUrl = new URL(filePath, request.url);
-  const assetResp = await env.ASSETS.fetch(new Request(assetUrl, request));
-  if (!assetResp.ok) return notFoundPage("mentor-asset-fetch-failed:" + filePath + ":status-" + assetResp.status);
+  const found = await fetchToolAsset(env, request, filePath);
+  if (!found.resp) return notFoundPage(BUILD + " mentor-asset-not-found: " + found.trace.join(" | "));
+  const assetResp = found.resp;
 
   let html = await assetResp.text();
   const inject =
@@ -342,8 +376,12 @@ function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
 }
 
+function esc(t) {
+  return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function notFoundPage(reason) {
-  return new Response(privatePageHtml("This link isn't valid", "Double check the link, or get in touch with whoever sent it to you." + (reason ? `<br><br><span style="font-size:11px;color:#a99;">debug: ${reason}</span>` : "")), {
+  return new Response(privatePageHtml("This link isn't valid", "Double check the link, or get in touch with whoever sent it to you." + (reason ? `<br><br><span style="font-size:11px;color:#a99;">debug: ${esc(String(reason).startsWith(BUILD) ? reason : BUILD + " " + reason)}</span>` : "")), {
     status: 404,
     headers: { "Content-Type": "text/html; charset=UTF-8" }
   });

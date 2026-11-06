@@ -126,13 +126,14 @@
       <div class="row">
         <div>
           <label for="c-tool">Tool</label>
-          <select id="c-tool">
+          <select id="c-tool" onchange="toolChanged()">
             <option value="partner-track">The Partner Track</option>
             <option value="practising-partner">The Practising Partner</option>
             <option value="firm-leader">The Firm Leader</option>
+            <option value="emerging-leader">The Emerging Leader (pilot)</option>
           </select>
         </div>
-        <div>
+        <div id="edition-wrap">
           <label for="c-edition">Edition</label>
           <select id="c-edition">
             <option value="A">Traditional partnership</option>
@@ -173,8 +174,20 @@
 const TOOL_LABELS = {
   "partner-track": "The Partner Track",
   "practising-partner": "The Practising Partner",
-  "firm-leader": "The Firm Leader"
+  "firm-leader": "The Firm Leader",
+  "emerging-leader": "The Emerging Leader (pilot)"
 };
+
+function toolChanged(){
+  const tool = document.getElementById('c-tool').value;
+  const wrap = document.getElementById('edition-wrap');
+  if(tool === 'emerging-leader'){
+    document.getElementById('c-edition').value = 'A';
+    wrap.style.display = 'none';
+  } else {
+    wrap.style.display = '';
+  }
+}
 
 async function checkAuth(){
   const r = await fetch('/api/admin-links');
@@ -273,7 +286,7 @@ async function loadLinks(){
         <td>${escapeHtml(l.name||'')}</td>
         <td>${escapeHtml(l.email||'')}</td>
         <td>${TOOL_LABELS[l.tool]||l.tool}</td>
-        <td>${l.edition||''}</td>
+        <td>${l.tool === 'emerging-leader' ? '-' : (l.edition||'')}</td>
         <td class="status-${l.status}">${l.status === 'completed' ? 'Completed' : 'Pending'}</td>
         <td>${mentorCell}</td>
         <td>${created}</td>
@@ -327,7 +340,7 @@ function buildRadarSVG(scores){
     const angle = (-90 + i * (360/n)) * Math.PI/180;
     return [cx + r*Math.cos(angle), cy + r*Math.sin(angle)];
   };
-  let svg = `<svg viewBox="0 0 ${size} ${size}" width="100%" style="max-width:560px;display:block;margin:0 auto;">`;
+  let svg = `<svg viewBox="-70 0 ${size+140} ${size}" width="100%" style="max-width:640px;display:block;margin:0 auto;">`;
 
   for(let lvl=1; lvl<=5; lvl++){
     const r = (lvl/5)*maxR;
@@ -371,7 +384,7 @@ function openDetail(index){
   if(l.status !== 'completed' || !l.results){
     body.innerHTML = `
       <h2>${escapeHtml(l.name||'')}</h2>
-      <p class="modal-sub">${escapeHtml(l.email||'')} &middot; ${TOOL_LABELS[l.tool]||l.tool} &middot; Edition ${l.edition||''} &middot; Created ${created}</p>
+      <p class="modal-sub">${escapeHtml(l.email||'')} &middot; ${TOOL_LABELS[l.tool]||l.tool} &middot; ${l.tool === 'emerging-leader' ? 'Pilot' : 'Edition ' + (l.edition||'')} &middot; Created ${created}</p>
       <p class="no-data" style="margin-top:20px;">This link is still pending &mdash; no results yet.</p>
     `;
     document.getElementById('detail-overlay').classList.add('active');
@@ -504,7 +517,7 @@ function openDetail(index){
 
   body.innerHTML = `
     <h2>${escapeHtml(l.name||res.name||'')}</h2>
-    <p class="modal-sub">${escapeHtml(l.email||'')} &middot; ${TOOL_LABELS[l.tool]||l.tool} &middot; Edition ${l.edition||''}${res.role ? ' &middot; ' + escapeHtml(res.role) : ''}${res.line ? ' &middot; ' + escapeHtml(res.line) : ''}</p>
+    <p class="modal-sub">${escapeHtml(l.email||'')} &middot; ${TOOL_LABELS[l.tool]||l.tool} &middot; ${l.tool === 'emerging-leader' ? 'Pilot' : 'Edition ' + (l.edition||'')}${res.role ? ' &middot; ' + escapeHtml(res.role) : ''}${res.line ? ' &middot; ' + escapeHtml(res.line) : ''}</p>
     <p class="modal-sub">Created ${created} &middot; Completed ${completed}</p>
 
     <div class="radar-wrap">${radarHtml}</div>

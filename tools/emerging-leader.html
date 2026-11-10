@@ -95,6 +95,7 @@
     font:inherit;font-size:15px;color:var(--ink);border-radius:0;
   }
   .fields input:focus{outline:none;border-color:var(--gold);box-shadow:0 1px 0 var(--gold)}
+  .fields > div:first-child{grid-column:1 / -1}
   .note{font-size:13.5px;color:var(--muted);margin-top:16px;border-left:2px solid var(--gold-pale);padding-left:12px}
 
   /* ———————————————— scale legend ———————————————— */
@@ -381,16 +382,13 @@
   <section class="screen active panel" id="screen-intro">
     <div class="kicker">Confidential Self-Assessment</div>
     <h1>Leading before you are asked to</h1>
-    <p class="epigraph">Distilled from thousands of hours spent working alongside partners — and those still some way from becoming them.</p>
-    <p class="lead">You are good at what you do — that is why you are being considered for more. But the skills that made you a strong senior performer — technical depth, reliability, getting the work done — are not the skills that make a partner. Between here and partnership sits a shift in behaviour: from doing the work to leading the people, clients and business around it. It starts well before the title, and the people who make it earliest are the ones who get there.</p>
-    <p class="lead">This diagnostic assesses you against the eight areas that define that shift. It takes about 20–25 minutes. Answer as you are <strong>today</strong>, not as you intend to be — the gaps are the point. Your results show where to focus the next six to twelve months. Nothing is stored as you go; when you finish, you will be invited to send your results to Emperico and can print a copy for yourself.</p>
+    <p class="epigraph" id="introEpigraph" style="display:none"></p>
+    <p class="lead">Eight areas, about 20–25 minutes. Answer as you are <strong>today</strong>, not as you intend to be — the gaps are the point.</p>
     <div class="fields">
       <div><label for="f-name">Your name</label><input id="f-name" type="text" autocomplete="name"></div>
       <div><label for="f-role">Current role / grade</label><input id="f-role" type="text" placeholder="e.g. Senior Manager, Associate Director"></div>
       <div><label for="f-line">Service line</label><input id="f-line" type="text" placeholder="e.g. Audit, Tax, Advisory"></div>
-      <div><label for="f-date">Date</label><input id="f-date" type="date"></div>
     </div>
-    <p class="note">Be honest rather than kind to yourself. This works best when you also ask your line manager to complete a companion view of you and compare notes — that conversation is where the value is.</p>
     <div class="nav"><span></span><button class="btn primary" onclick="startAssessment()">Begin the diagnostic</button></div>
   </section>
 
@@ -606,7 +604,7 @@ const DIMS = [
       "I give feedback early and specifically, even when it is uncomfortable.",
       "I know what each person in my team wants from their career, and what is holding them back.",
       "I give people stretching work, with support, rather than keeping the interesting work for myself.",
-      "I have developed someone who has gone on to be promoted or to take on bigger work.",
+      "I develop people who go on to be promoted or to take on bigger work.",
       "I make time to coach, not just to review."
     ],
     suggestions:[
@@ -636,7 +634,7 @@ const DIMS = [
     intro:"Partners run a business, not a set of engagements. The shift is from delivering the work on time to understanding what it earns and what it costs.",
     items:[
       "I know the margin on my work and act on it before the engagement ends.",
-      "I scope and price work on its value to the client, not just the hours it will take.",
+      "When I scope or price work, I base it on its value to the client, not just the hours it will take.",
       "I agree changes in scope with the client early, rather than absorbing them.",
       "I manage billing and recovery as part of the job, not as an afterthought.",
       "I make decisions about my team's time with the firm's priorities in mind, not only my own engagements."
@@ -651,11 +649,11 @@ const DIMS = [
     key:"opportunity", name:"Create Opportunity",
     intro:"Partnership depends on bringing in work, not only delivering it. The shift is from waiting for work to creating it.",
     items:[
-      "I have originated work in the last year, not just delivered what was handed to me.",
+      "I originate work, not just deliver what is handed to me.",
       "I spot opportunities within existing clients and raise them with the right person.",
       "I build relationships outside my current clients, with people who could one day become clients or refer them.",
       "People inside and outside the firm know what I am good at.",
-      "I keep a visible list of the opportunities I am working on, and review it regularly."
+      "I keep an up-to-date list of the opportunities I am working on, and review it with a partner."
     ],
     suggestions:[
       "Identify one opportunity within an existing client this quarter and take it to a partner so you can plan the approach together.",
@@ -667,7 +665,7 @@ const DIMS = [
     key:"influence", name:"Influence Beyond Your Authority",
     intro:"As you progress, more of what matters depends on people who do not report to you. The shift is from directing to persuading.",
     items:[
-      "I can move a senior stakeholder or partner to a decision without having the title to insist.",
+      "I move senior stakeholders and partners to a decision without having the title to insist.",
       "I raise concerns with senior people early and constructively, rather than avoiding them or escalating late.",
       "I build support for an idea before the meeting, not in it.",
       "I work well with peers in other teams and service lines, including when our interests differ.",
@@ -683,11 +681,11 @@ const DIMS = [
     key:"show-up", name:"Show Up as a Leader",
     intro:"Partners are judged on judgement, composure and credibility as much as on output. The shift is from proving you are good to being someone others choose to follow.",
     items:[
-      "Under pressure, I stay calm and decisive, and others take their cue from me.",
+      "Under pressure, I stay calm, and others take their cue from me.",
       "I make decisions with incomplete information and accept accountability for them.",
-      "I own my mistakes openly and learn from them in front of others.",
+      "I own my mistakes openly and say what I have learned from them.",
       "People trust me with difficult or sensitive situations.",
-      "Partners and senior colleagues would already trust me to represent the firm in a room that matters."
+      "I represent the firm credibly in senior client and internal meetings."
     ],
     suggestions:[
       "Ask two partners or senior colleagues what would make them trust you with a bigger role. Listen without defending.",
@@ -757,7 +755,7 @@ let currentDim = -1;
 
 /* ——— Working style (original Emperico DISC-style module) ——— */
 const STYLE_BLOCKS = [
-  {stem:"In a partner or team meeting, I am usually the one who…", opts:{
+  {stem:"In a team or client meeting, I am usually the one who…", opts:{
     D:"pushes for a decision so we can move.",
     I:"brings energy and gets people talking.",
     S:"makes sure everyone has been heard.",
@@ -991,8 +989,6 @@ function show(id){
 }
 
 function startAssessment(){
-  const d = document.getElementById('f-date');
-  if(!d.value){ d.valueAsDate = new Date(); }
   document.getElementById('progress').style.display='block';
   goToDim(0);
 }
@@ -1113,7 +1109,8 @@ function showResults(){
   const name = document.getElementById('f-name').value.trim();
   const role = document.getElementById('f-role').value.trim();
   const line = document.getElementById('f-line').value.trim();
-  const date = document.getElementById('f-date').value;
+  // the date is taken automatically, at the moment the assessment is finished
+  const date = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
   const refl = [
     {q:"Natural foundations", a:document.getElementById('r1').value.trim()},
     {q:"Hardest to let go of", a:document.getElementById('r2').value.trim()},
@@ -1389,7 +1386,7 @@ if(MENTOR_MODE){
   var _introLeads = document.querySelectorAll("#screen-intro .lead");
   var _introNote = document.querySelector("#screen-intro .note");
   if(_introH1) _introH1.textContent = PARTICIPANT_NAME ? ("Rating " + PARTICIPANT_NAME) : "A line manager's view";
-  if(_introEpi) _introEpi.textContent = "You've been asked to give your honest view of " + (PARTICIPANT_NAME || "a colleague") + " against this framework.";
+  if(_introEpi){ _introEpi.textContent = "You've been asked to give your honest view of " + (PARTICIPANT_NAME || "a colleague") + " against this framework."; _introEpi.style.display = ""; }
   if(_introLeads && _introLeads[0]) _introLeads[0].textContent = "Your answers are confidential to Emperico and will not be shown to " + (PARTICIPANT_NAME || "them") + " directly. Please rate them as you see them today, not as you'd like them to be — honest, specific answers are what make this useful.";
   if(_introLeads && _introLeads[1]) _introLeads[1].style.display = "none";
   if(_introNote) _introNote.style.display = "none";
